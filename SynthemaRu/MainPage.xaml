@@ -1,0 +1,284 @@
+﻿<phone:PhoneApplicationPage
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:UI="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI"
+    x:Class="SynthemaRu.MainPage"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="False" Background="Black">
+
+    <toolkit:TransitionService.NavigationInTransition>
+        <toolkit:NavigationInTransition>
+            <toolkit:NavigationInTransition.Backward>
+                <toolkit:SlideTransition Mode="SlideUpFadeIn" />
+            </toolkit:NavigationInTransition.Backward>
+            <toolkit:NavigationInTransition.Forward>
+                <toolkit:SlideTransition Mode="SlideUpFadeIn"/>
+            </toolkit:NavigationInTransition.Forward>
+        </toolkit:NavigationInTransition>
+    </toolkit:TransitionService.NavigationInTransition>
+
+    <toolkit:TransitionService.NavigationOutTransition>
+        <toolkit:NavigationOutTransition>
+            <toolkit:NavigationOutTransition.Backward>
+                <toolkit:SlideTransition Mode="SlideDownFadeOut"/>
+            </toolkit:NavigationOutTransition.Backward>
+            <toolkit:NavigationOutTransition.Forward>
+                <toolkit:SlideTransition Mode="SlideDownFadeOut"/>
+            </toolkit:NavigationOutTransition.Forward>
+        </toolkit:NavigationOutTransition>
+    </toolkit:TransitionService.NavigationOutTransition>
+
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="false" IsMenuEnabled="False" Mode="Minimized" BackgroundColor="Black" ForegroundColor="White">
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
+                <shell:ApplicationBarMenuItem Text="MenuItem 2"/>
+            </shell:ApplicationBar.MenuItems>
+            <shell:ApplicationBarIconButton IconUri="/Assets/AppBar/feature.calendar.png" Text="кратко"/>
+            <shell:ApplicationBarIconButton x:Name="RefreshAppButton" IconUri="/Assets/AppBar/refresh.png" Text="Обновить" IsEnabled="True" Click="RefreshAppButton_Click_1"/>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot">
+
+        <!-- LOCALIZATION NOTE:
+            To localize the displayed strings copy their values to appropriately named
+            keys in the app's neutral language resource file (AppResources.resx) then
+            replace the hard-coded text value between the attributes' quotation marks
+            with the binding clause whose path points to that string name.
+
+            For example:
+
+                Text="{Binding Path=LocalizedResources.ApplicationTitle, Source={StaticResource LocalizedStrings}}"
+
+            This binding points to the template's string resource named "ApplicationTitle".
+
+            Adding supported languages in the Project Properties tab will create a
+            new resx file per language that can carry the translated values of your
+            UI strings. The binding in these examples will cause the value of the
+            attributes to be drawn from the .resx file that matches the
+            CurrentUICulture of the app at run time.
+         -->
+
+        <!--Pivot Control-->
+        <phone:Pivot x:Name="MainPivot" Title=" " SelectionChanged="Pivot_SelectionChanged_1" Foreground="White" Background="Black">
+            <!--Pivot item one-->
+            <phone:PivotItem Header="новости">
+                <!--Double line list with text wrapping-->
+                <ListBox x:Name="news_ListBox" Tap="news_ListBox_Tap" Margin="15,0,0,0" SelectionChanged="news_ListBox_SelectionChanged" ManipulationCompleted="news_ListBox_ManipulationCompleted" ManipulationDelta="news_ListBox_ManipulationDelta">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" Padding="0,0,0,20" >
+                                    <TextBlock.Foreground>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFFFF300" Offset="0"/>
+                                            <GradientStop Color="#FFE69D00" Offset="1"/>
+                                            <GradientStop Color="#FFEAB500" Offset="0.713"/>
+                                        </LinearGradientBrush>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+
+                                <!--TextBlock TextWrapping="Wrap" Text="{Binding PubDate}" /-->
+
+                                <Grid VerticalAlignment="Top" Margin="0,0,0,50" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="newsImage_Tap" />
+
+                                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                                    <Run Text="Label:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Label}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                                    <Run Text="Format:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Format}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                                    <Run Text="Country:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Country}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                                    <Run Text="Style:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Style}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                                    <Run Text="Quality:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Quality}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                                    <Run Text="Size:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Size}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </phone:PivotItem>
+
+            <!--Pivot item two-->
+            <phone:PivotItem Header="рецензии">
+                <!--Double line list no text wrapping-->
+                <ListBox  x:Name="reviews_ListBox" Tap="news_ListBox_Tap" Margin="15,0,0,0" SelectionChanged="news_ListBox_SelectionChanged" >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Padding="0,0,0,20" >
+                                    <TextBlock.Foreground>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFFFF300" Offset="0"/>
+                                            <GradientStop Color="#FFE69D00" Offset="1"/>
+                                            <GradientStop Color="#FFEAB500" Offset="0.713"/>
+                                        </LinearGradientBrush>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+
+                                <!--TextBlock TextWrapping="Wrap" Text="{Binding PubDate}" /-->
+
+                                <Grid VerticalAlignment="Top" Margin="0,0,0,50" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="200"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="reviewsImage_Tap" />
+
+                                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                        <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA" FontFamily="Portable User Interface" FontStretch="Condensed">
+                                                    <Run Text="Label:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Label}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                                                    <Run Text="Format:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Format}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                                                    <Run Text="Country:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Country}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                                                    <Run Text="Style:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Style}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                                                    <Run Text="Quality:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Quality}" />
+                                        </TextBlock>
+                                        <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                                                    <Run Text="Size:" FontWeight="Bold" />
+                                                    <Run Text="{Binding Size}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </phone:PivotItem>
+
+            <!--Pivot item two-->
+            <phone:PivotItem Header="поиск" Margin="12,28,12,80">
+                <TextBox x:Name="SearchBox" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" Text="Что ищем?" VerticalAlignment="Top" Width="456" GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus" Foreground="Black" Background="#BFFFFFFF" SelectionForeground="White" CaretBrush="Black" BorderBrush="#BF000000"/>
+            </phone:PivotItem>
+
+            <!--Pivot item two-->
+            <phone:PivotItem Header="synth radio" Margin="12,28,12,80">
+                <Grid Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="190"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Image x:Name="playButton" Grid.ColumnSpan="2" Height="200" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Source="Resources/play.png" MouseEnter="playButton_MouseEnter" MouseLeave="playButton_MouseLeave" Margin="0,20,0,50" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Качество: " HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
+
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0">
+                        <TextBlock Text="96k" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
+                        <toolkit:ToggleSwitch Content="" HorizontalAlignment="Center" Background="#FFFFF300" Checked="ToggleSwitch_Checked_1" Unchecked="ToggleSwitch_Unchecked_1" FontSize="32" />
+                        <TextBlock Text="128k" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
+                    </StackPanel>
+
+                    <TextBlock x:Name="Quality" Grid.ColumnSpan="2" Grid.Row="2" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" TextWrapping="Wrap" />
+
+                    <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0,0,20">
+                        <Image Source="Resources/sr4.jpg" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="0,0,0,10" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Disclaimer" Text="Аудиопоток предоставлен сайтом" VerticalAlignment="Top" Foreground="Black" />
+                            <HyperlinkButton Content="synth-radio.ru" FontSize="20" VerticalAlignment="Top" Foreground="#FF002980" FontWeight="Bold" Click="HyperlinkButton_Click_1" />
+                        </StackPanel>
+                    </Grid>
+
+                </Grid>
+            </phone:PivotItem>
+
+            <!--Pivot item three-->
+            <phone:PivotItem Header="ссылки" Margin="12,28,12,80">
+                <!-- //////////////////////////////////////// -->
+                <ListBox x:Name="Links" Tap="Links_Tap">
+                    <HyperlinkButton x:Name="synthema" NavigateUri="http://synthema.ru/" Content="Synthema.ru" FontSize="40" TargetName="_blank" UseLayoutRounding="True" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="twitter" NavigateUri="http://twitter.com/synthema_ru/" Content="Twitter" FontSize="40" TargetName="_blank" UseLayoutRounding="True" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="lastfm" NavigateUri="http://www.lastfm.ru/group/synthema.ru" Content="Last.fm" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="DAC" NavigateUri="http://www.deutsche-alternative-charts.de/" Content="DAC" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="EAC" NavigateUri="http://www.alt-charts.eu/" Content="EAC" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="GEWS" NavigateUri="http://www.gewc.de/reviews,0,2,1.html" Content="GEWS" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="ChildOfNight" NavigateUri="http://deti-nochi.kiev.ua/" Content="Дети Ночи" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="OldSchoolEBM" NavigateUri="http://www.oldschoolebm.ru/" Content="OldSchoolEBM.ru" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="DarkBelarus" NavigateUri="http://dark.by/" Content="DarkBelarus" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="Alldayplus" NavigateUri="http://alldayplus.ru/" Content="Alldayplus.ru" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                    <HyperlinkButton x:Name="Zillo" NavigateUri="http://zillo.de/" Content="Zillo" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                </ListBox>
+            </phone:PivotItem>
+
+            <!--Pivot item three-->
+            <phone:PivotItem Header="о программе" Margin="12,28,12,80">
+                <StackPanel Orientation="Vertical" Margin="10,0">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                    	<Run Text="Неофициальный клиент для сайта Synthema.ru"/>
+                    </TextBlock>
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                    	<Run Text="В программе используется потоковое аудио с сайта synth-radio.ru"/>
+                    </TextBlock>
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                    	<Run Text="Автор: Горячев Александр"/>
+                    </TextBlock>
+                </StackPanel>   
+            </phone:PivotItem>
+        </phone:Pivot>
+        <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
+        <ProgressBar Background="{x:Null}" x:Name="TopPageProgressBar"
+            Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top"/>
+        
+        <UI:AdControl x:Name="Adverts" ApplicationId="test_client" AdUnitId="Image480_80" Height="80" Width="480" VerticalAlignment="Bottom"/>
+
+        <!--Uncomment to see an alignment grid to help ensure your controls are
+            aligned on common boundaries.  The image has a top margin of -32px to
+            account for the System Tray. Set this to 0 (or remove the margin altogether)
+            if the System Tray is hidden.
+
+            Before shipping remove this XAML and the image itself.-->
+        <!--<Image Source="/Assets/AlignmentGrid.png" VerticalAlignment="Top" Height="800" Width="480" Margin="0,-32,0,0" Grid.Row="0" IsHitTestVisible="False" />-->
+    </Grid>
+</phone:PhoneApplicationPage>
