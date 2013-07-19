@@ -20,7 +20,7 @@ namespace SynthemaRu
     public partial class MainPage : PhoneApplicationPage
     {        
         // Constructor
-        private Uri newsUrl = new Uri("http://www.synthema.ru/page/2");
+        private Uri newsUrl = new Uri("http://www.synthema.ru");
         private Uri reviewsRssPath = new Uri("http://www.synthema.ru/reviews/rss.xml");
 
         private List<NewsItem> NewsItemsList = new List<NewsItem>();
@@ -123,6 +123,7 @@ namespace SynthemaRu
             }
             
             NewsListBox.ItemsSource = NewsItemsList;
+            var lbc = NewsListBox.Items.Count();
 
             TopPageProgressBar.IsIndeterminate = false;
         }
