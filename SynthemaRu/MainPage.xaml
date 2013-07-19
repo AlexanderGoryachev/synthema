@@ -72,15 +72,21 @@
          -->
 
         <!--Pivot Control-->
-        <phone:Pivot x:Name="MainPivot" Title=" " SelectionChanged="Pivot_SelectionChanged_1" Foreground="White" Background="Black">
+        <phone:Pivot x:Name="MainPivot" Title=" " SelectionChanged="Pivot_SelectionChanged_1" Foreground="White" >
             <!--Pivot item one-->
             <phone:PivotItem Header="новости">
                 <!--Double line list with text wrapping-->
-                <ListBox x:Name="news_ListBox" Tap="news_ListBox_Tap" Margin="15,0,0,0" SelectionChanged="news_ListBox_SelectionChanged" ManipulationCompleted="news_ListBox_ManipulationCompleted" ManipulationDelta="news_ListBox_ManipulationDelta">
+                <ListBox x:Name="NewsListBox" Margin="15,0,0,0" SelectionChanged="NewsListBox_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" Padding="0,0,0,20" >
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,20" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" >
                                     <TextBlock.Foreground>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                             <GradientStop Color="#FFFFF300" Offset="0"/>
@@ -90,53 +96,61 @@
                                     </TextBlock.Foreground>
                                 </TextBlock>
 
-                                <!--TextBlock TextWrapping="Wrap" Text="{Binding PubDate}" /-->
-
-                                <Grid VerticalAlignment="Top" Margin="0,0,0,50" >
+                                <Grid Grid.Row="1" VerticalAlignment="Top" Margin="0,0,0,20" >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="200"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
 
-                                    <Image Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="newsImage_Tap" />
+                                    <Image Width="180" Height="180" Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="NewsImage_Tap" />
 
-                                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                    <!--StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,20">
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Label:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Label}" />
+                                            <Run Text="Label:" FontWeight="Bold" />
+                                            <Run Text="{Binding Label}" />
                                         </TextBlock>
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Format:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Format}" />
+                                            <Run Text="Format:" FontWeight="Bold" />
+                                            <Run Text="{Binding Format}" />
                                         </TextBlock>
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Country:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Country}" />
+                                            <Run Text="Country:" FontWeight="Bold" />
+                                            <Run Text="{Binding Country}" />
                                         </TextBlock>
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Style:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Style}" />
+                                            <Run Text="Style:" FontWeight="Bold" />
+                                            <Run Text="{Binding Style}" />
                                         </TextBlock>
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Quality:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Quality}" />
+                                            <Run Text="Quality:" FontWeight="Bold" />
+                                            <Run Text="{Binding Quality}" />
                                         </TextBlock>
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Size:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Size}" />
+                                            <Run Text="Size:" FontWeight="Bold" />
+                                            <Run Text="{Binding Size}" />
                                         </TextBlock>
-                                    </StackPanel>
+                                    </StackPanel-->
+
+                                    <TextBlock FontSize="24" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Description}" TextWrapping="Wrap" Foreground="White" />
                                 </Grid>
-                            </StackPanel>
+                                
+                                <TextBlock Grid.Row="2" TextWrapping="Wrap" Text="{Binding PubDate}" FontSize="18" Margin="0,0,0,40" Foreground="#FFCCCCCC" />
+
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+                
             </phone:PivotItem>
 
             <!--Pivot item two-->
             <phone:PivotItem Header="рецензии">
                 <!--Double line list no text wrapping-->
-                <ListBox  x:Name="reviews_ListBox" Tap="news_ListBox_Tap" Margin="15,0,0,0" SelectionChanged="news_ListBox_SelectionChanged" >
+                <ListBox  x:Name="reviews_ListBox" Tap="NewsListBox_Tap" Margin="15,0,0,0" >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
@@ -237,7 +251,7 @@
             <!--Pivot item three-->
             <phone:PivotItem Header="ссылки" Margin="12,28,12,80">
                 <!-- //////////////////////////////////////// -->
-                <ListBox x:Name="Links" Tap="Links_Tap">
+                <ListBox x:Name="Links">
                     <HyperlinkButton x:Name="synthema" NavigateUri="http://synthema.ru/" Content="Synthema.ru" FontSize="40" TargetName="_blank" UseLayoutRounding="True" Foreground="#FFAAAAAA"/>
                     <HyperlinkButton x:Name="twitter" NavigateUri="http://twitter.com/synthema_ru/" Content="Twitter" FontSize="40" TargetName="_blank" UseLayoutRounding="True" Foreground="#FFAAAAAA"/>
                     <HyperlinkButton x:Name="lastfm" NavigateUri="http://www.lastfm.ru/group/synthema.ru" Content="Last.fm" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
@@ -267,7 +281,9 @@
                 </StackPanel>   
             </phone:PivotItem>
         </phone:Pivot>
+        
         <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
+        
         <ProgressBar Background="{x:Null}" x:Name="TopPageProgressBar"
             Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top"/>
         
