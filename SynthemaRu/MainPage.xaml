@@ -77,7 +77,7 @@
                 <ListBox x:Name="NewsListBox" Margin="15,0,0,0" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>                            
-                            <StackPanel x:Name="NewsTitleStackPanel" Tap="NewsTitleStackPanel_Tap" >                             
+                            <StackPanel x:Name="NewsStackPanel" Tap="NewsStackPanel_Tap" >                             
                                 <TextBlock Grid.Row="0" TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,20" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" >
                                     <TextBlock.Foreground>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

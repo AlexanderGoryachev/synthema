@@ -31,9 +31,10 @@ namespace SynthemaRu
         #region NewsDetail
 
         public static List<Comment> Comments = new List<Comment>();
+
         public class Comment
         {
-            public string Nickname { get; set; }
+            public string Username { get; set; }
             public string Userpic { get; set; }
             public string Date { get; set; }
             public string Text { get; set; }

@@ -49,7 +49,7 @@ namespace SynthemaRu
         
         #region News
         
-        void DownloadNewsRss(string Path)
+        void DownloadNews(string Path)
         {
             WebClient news = new WebClient();
             news.Encoding = new Windows1251Encoding();
@@ -92,10 +92,10 @@ namespace SynthemaRu
                 var _link = node.SelectSingleNode(@"div[@class='tbh']/h2/a").GetAttributeValue("href", "http://");
 
                 var _thumbUrl = "";
-                try { _thumbUrl = Constants.NewsUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/a/img").GetAttributeValue("src", ""); }
+                try { _thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/a/img").GetAttributeValue("src", ""); }
                 catch
                 {
-                    try { _thumbUrl = Constants.NewsUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/img").GetAttributeValue("src", ""); }
+                    try { _thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/img").GetAttributeValue("src", ""); }
                     catch { }
                 }
 
@@ -140,13 +140,16 @@ namespace SynthemaRu
             }
         }
 
-        private void NewsTitleStackPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private void NewsStackPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if (NewsListBox.SelectedItem != null)
             {
-                WebBrowserTask task = new WebBrowserTask();
-                task.Uri = new Uri(AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
-                task.Show();
+                //WebBrowserTask task = new WebBrowserTask();
+                //task.Uri = new Uri(AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
+                //task.Show();
+
+                var newsDetailPath = AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link;
+                NavigationService.Navigate(new Uri("/NewsDetail.xaml?newsDetailPath=" + newsDetailPath, UriKind.Relative));
             }
         }
         
@@ -351,7 +354,7 @@ namespace SynthemaRu
             if (MainPivot.SelectedIndex == 0)
             {
                 ApplicationBar.IsVisible = true;
-                DownloadNewsRss(Constants.NewsUrl);
+                DownloadNews(Constants.BaseUrl);
                 Adverts.Visibility = Visibility.Collapsed;
             }
 

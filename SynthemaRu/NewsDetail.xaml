@@ -11,7 +11,7 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="True">
+    shell:SystemTray.IsVisible="false">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
@@ -34,6 +34,8 @@
         
         <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
 
+        <ProgressBar Background="{x:Null}" x:Name="TopPageProgressBar"
+            Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top"/>
 
     </Grid>
     
