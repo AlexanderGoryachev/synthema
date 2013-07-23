@@ -1,0 +1,40 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="SynthemaRu.NewsDetail"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="True">
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <!--Pivot Control-->
+        <phone:Pivot Title=" ">
+            <!--Pivot item one-->
+            <phone:PivotItem Header="описание">
+                <Grid>
+                    <ScrollViewer>
+                        <Image HorizontalAlignment="Left" VerticalAlignment="Top" Height="240" Width="240"></Image>
+                    </ScrollViewer>
+                </Grid>
+            </phone:PivotItem>
+
+            <!--Pivot item two-->
+            <phone:PivotItem Header="комментарии">
+                <Grid/>
+            </phone:PivotItem>
+        </phone:Pivot>
+        
+        <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
+
+
+    </Grid>
+    
+</phone:PhoneApplicationPage>

@@ -7,8 +7,9 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using SynthemaRu.Resources;
-using SynthemaRu.ViewModels;
 using Microsoft.Phone.BackgroundAudio;
+using System.IO.IsolatedStorage;
+using System.IO;
 
 namespace SynthemaRu
 {
@@ -16,25 +17,7 @@ namespace SynthemaRu
     {
 
         public static AudioTrack currentTrack = null;
-
-        private static MainViewModel viewModel = null;
-
-        /// <summary>
-        /// A static ViewModel used by the views to bind against.
-        /// </summary>
-        /// <returns>The MainViewModel object.</returns>
-        public static MainViewModel ViewModel
-        {
-            get
-            {
-                // Delay creation of the view model until necessary
-                if (viewModel == null)
-                    viewModel = new MainViewModel();
-
-                return viewModel;
-            }
-        }
-
+        
         /// <summary>
         /// Provides easy access to the root frame of the Phone Application.
         /// </summary>
@@ -90,16 +73,14 @@ namespace SynthemaRu
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
             // Ensure that application state is restored appropriately
-            if (!App.ViewModel.IsDataLoaded)
-            {
-                App.ViewModel.LoadData();
-            }
+            AppData.NewsString = GetHtmlStringFromIsolatedStorage(Constants.StorageNewsHtmlName);
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
         private void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
+            SaveHtmlStringToIsolatedStorage(Constants.StorageNewsHtmlName);
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
@@ -107,6 +88,29 @@ namespace SynthemaRu
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
             // Ensure that required application state is persisted here.
+            SaveHtmlStringToIsolatedStorage(Constants.StorageNewsHtmlName);
+        }
+
+        private void SaveHtmlStringToIsolatedStorage(string HtmlString)
+        {
+            var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(Constants.StorageNewsHtmlName, FileMode.OpenOrCreate);
+            if (file.Equals(HtmlString) == false)
+            {
+                var fileWriter = new StreamWriter(file);
+                fileWriter.WriteAsync(HtmlString);
+            }
+        }
+
+        private string GetHtmlStringFromIsolatedStorage(string HtmlStringFileName)
+        {
+            var HtmlString = "";
+            if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(HtmlStringFileName))
+            {
+                var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(HtmlStringFileName, FileMode.Open);
+                var fileReader = new StreamReader(file);
+                HtmlString = fileReader.ReadToEnd();
+            }            
+            return HtmlString;
         }
 
         // Code to execute if a navigation fails

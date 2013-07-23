@@ -6,6 +6,8 @@ using Microsoft.Phone.Tasks;
 using MSPToolkit.Encodings;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -20,12 +22,8 @@ namespace SynthemaRu
     public partial class MainPage : PhoneApplicationPage
     {        
         // Constructor
-        private Uri newsUrl = new Uri("http://www.synthema.ru");
-        private Uri reviewsRssPath = new Uri("http://www.synthema.ru/reviews/rss.xml");
-
-        private List<NewsItem> NewsItemsList = new List<NewsItem>();
-
-        private List<ReviewsItem> reviewsItemsList = new List<ReviewsItem>();
+        
+        private List<ReviewsItem> reviewsItems = new List<ReviewsItem>();
         private XElement xmlReviewsOld = null;
         private MediaPlayerLauncher mediaPlayerLauncher = new MediaPlayerLauncher();
 
@@ -40,8 +38,6 @@ namespace SynthemaRu
 
             BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(Instance_PlayStateChanged);
 
-            DownloadNewsRss(newsUrl);
-
             playBmp.UriSource = new Uri(@"Resources/play.png", UriKind.Relative);
             playPrsBmp.UriSource = new Uri(@"Resources/play_prs.png", UriKind.Relative);
             pauseBmp.UriSource = new Uri(@"Resources/pause.png", UriKind.Relative);
@@ -53,30 +49,12 @@ namespace SynthemaRu
         
         #region News
         
-        public class NewsItem
-        {
-            public string Title { get; set; }
-            public string Link { get; set; }
-            public string ImgUrl { get; set; }
-            public string ThumbUrl { get; set; }
-            public string Description { get; set; }
-            public string Category { get; set; }
-            public string PubDate { get; set; }
-
-            public string Label { get; set; }
-            public string Format { get; set; }
-            public string Country { get; set; }
-            public string Style { get; set; }
-            public string Quality { get; set; }
-            public string Size { get; set; }
-        }
-
-        void DownloadNewsRss(Uri rssPath)
+        void DownloadNewsRss(string Path)
         {
             WebClient news = new WebClient();
             news.Encoding = new Windows1251Encoding();
+            news.DownloadStringAsync(new Uri(Path));
             news.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadNewsStringCompleted);
-            news.DownloadStringAsync(rssPath);
             TopPageProgressBar.IsIndeterminate = true;
         }
 
@@ -85,8 +63,24 @@ namespace SynthemaRu
             if (e.Error != null)
                 return;
 
+            if (AppData.NewsString.Equals(e.Result) == false)
+            {
+                AppData.NewsString = e.Result;
+                ParseNewsHtml(e.Result);
+                NewsListBox.ItemsSource = AppData.NewsItems;
+            }
+            else
+            {
+                NewsListBox.ItemsSource = AppData.NewsItems;                
+            }
+
+            TopPageProgressBar.IsIndeterminate = false;
+        }
+
+        private void ParseNewsHtml(string HtmlString)
+        {
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(e.Result);
+            doc.LoadHtml(HtmlString);
 
             HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@".//*[@id='dle-content']/div[@class='theblock']");
             if (nodes == null)
@@ -98,60 +92,64 @@ namespace SynthemaRu
                 var _link = node.SelectSingleNode(@"div[@class='tbh']/h2/a").GetAttributeValue("href", "http://");
 
                 var _thumbUrl = "";
-                try { _thumbUrl = newsUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/a/img").GetAttributeValue("src", ""); }
-                catch 
-                { 
-                    try { _thumbUrl = newsUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/img").GetAttributeValue("src", ""); }
-                    catch { } 
+                try { _thumbUrl = Constants.NewsUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/a/img").GetAttributeValue("src", ""); }
+                catch
+                {
+                    try { _thumbUrl = Constants.NewsUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/img").GetAttributeValue("src", ""); }
+                    catch { }
                 }
 
                 var _imgUrl = "";
                 try { _imgUrl = node.SelectSingleNode(@"div[@class='news']/div/div[1]/a").GetAttributeValue("href", ""); }
                 catch { }
 
+                var _details = node.SelectSingleNode(@"div[@class='news']/div/div[2]").LastChild.InnerHtml.Replace("<br>", "\n");
+
                 var _description = node.SelectSingleNode(@"div[@class='news']/div").LastChild.InnerText;
                 var _pubDate = node.SelectSingleNode(@"div[@class='tbnfo']").InnerText.Replace("&nbsp;", "");
 
-                NewsItemsList.Add(new NewsItem{
+                AppData.NewsItems.Add(new AppData.NewsItem
+                {
                     Title = _title,
                     Link = _link,
                     ImgUrl = _imgUrl,
                     ThumbUrl = _thumbUrl,
+                    Details = _details,
                     Description = _description,
                     PubDate = _pubDate
                 });
             }
-            
-            NewsListBox.ItemsSource = NewsItemsList;
-            var lbc = NewsListBox.Items.Count();
-
-            TopPageProgressBar.IsIndeterminate = false;
         }
 
         private void NewsListBox_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if (NewsListBox.SelectedItem != null)
             {
-                WebBrowserTask wbt = new WebBrowserTask();
-                wbt.Uri = new Uri(NewsItemsList.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
-                wbt.Show();
+                WebBrowserTask task = new WebBrowserTask();
+                task.Uri = new Uri(AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
+                task.Show();
             }
         }
 
         private void NewsImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            string imgUrl = NewsItemsList.ElementAt(NewsListBox.SelectedIndex).ImgUrl;
+            string imgUrl = AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).ImgUrl;
             if (imgUrl != "")
             {
                 NavigationService.Navigate(new Uri("/ImagePage.xaml?imgUrl=" + imgUrl, UriKind.Relative));
             }
         }
 
-        private void NewsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void NewsTitleStackPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-
+            if (NewsListBox.SelectedItem != null)
+            {
+                WebBrowserTask task = new WebBrowserTask();
+                task.Uri = new Uri(AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
+                task.Show();
+            }
         }
-
+        
         #endregion
 
         #region Reviews
@@ -174,12 +172,12 @@ namespace SynthemaRu
             public string Size { get; set; }
         }
 
-        void DownloadReviewsRss(Uri rssPath)
+        void DownloadReviewsRss(string Path)
         {
             WebClient reviews = new WebClient();
             reviews.Encoding = new Windows1251Encoding();
             reviews.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadReviewsStringCompleted);
-            reviews.DownloadStringAsync(rssPath);
+            reviews.DownloadStringAsync(new Uri (Path));
             TopPageProgressBar.IsIndeterminate = true;
         }
 
@@ -213,15 +211,15 @@ namespace SynthemaRu
                 int n = reviews_Items.Count();
                 //int n = 2;
 
-                if (reviewsItemsList.Any())
+                if (reviewsItems.Any())
                 {
-                    if (reviews_Items.ElementAt(0).Title != reviewsItemsList.ElementAt(0).Title)
+                    if (reviews_Items.ElementAt(0).Title != reviewsItems.ElementAt(0).Title)
                     {
                         for (int i = 0; i < n; i++)
                         {
-                            reviewsItemsList.Clear();
+                            reviewsItems.Clear();
                             reviews_ListBox.Items.Clear();
-                            reviewsItemsList.Add(reviews_Items.ElementAt(i));
+                            reviewsItems.Add(reviews_Items.ElementAt(i));
                             reviews_ListBox.Items.Add(reviews_Items.ElementAt(i));
                         }
                     }
@@ -230,11 +228,20 @@ namespace SynthemaRu
                 {
                     for (int i = 0; i < n; i++)
                     {
-                        reviewsItemsList.Add(reviews_Items.ElementAt(i));
+                        reviewsItems.Add(reviews_Items.ElementAt(i));
                         reviews_ListBox.Items.Add(reviews_Items.ElementAt(i));
                     }
                 }
             }     
+        }
+
+        private void reviewsImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            string imgUrl = reviewsItems.ElementAt(reviews_ListBox.SelectedIndex).ImgUrl;
+            if (imgUrl != "")
+            {
+                NavigationService.Navigate(new Uri("/ImagePage.xaml?imgUrl=" + imgUrl, UriKind.Relative));
+            }
         }
         
         #endregion
@@ -261,31 +268,6 @@ namespace SynthemaRu
 
         #region Radio player
 
-        private void RefreshAppButton_Click_1(object sender, EventArgs e)
-        {
-            if (MainPivot.SelectedIndex == 0) // обновить новости
-            {
-                DownloadNewsRss(newsUrl);
-            }
-            else if (MainPivot.SelectedIndex == 1) // обновить рецензии
-            {
-                DownloadReviewsRss(reviewsRssPath);
-            }
-            else if (MainPivot.SelectedIndex == 2) // обновить поиск
-            {
-            }
-            else if (MainPivot.SelectedIndex == 3) // обновить радио
-            {
-            }
-            else if (MainPivot.SelectedIndex == 4) // обновить ссылки
-            {
-            }
-            else if (MainPivot.SelectedIndex == 5) // обновить о программе
-            {
-            }
-        }
-
-
         void Instance_PlayStateChanged(object sender, EventArgs e)
         {
             switch (BackgroundAudioPlayer.Instance.PlayerState)
@@ -307,27 +289,18 @@ namespace SynthemaRu
             }
         }
         
-        private void ToggleSwitch_Checked_1(object sender, RoutedEventArgs e) // НЕ РАБОТАЕТ /////////////////////////////////////////
+        private void ToggleSwitch_Checked(object sender, RoutedEventArgs e) // НЕ РАБОТАЕТ /////////////////////////////////////////
         {
             playButton.Source = playBmp;
             TopPageProgressBar.IsIndeterminate = true;
             BackgroundAudioPlayer.Instance.SkipNext();
         }
 
-        private void ToggleSwitch_Unchecked_1(object sender, RoutedEventArgs e) // НЕ РАБОТАЕТ /////////////////////////////////////////
+        private void ToggleSwitch_Unchecked(object sender, RoutedEventArgs e) // НЕ РАБОТАЕТ /////////////////////////////////////////
         {
             playButton.Source = playBmp;
             TopPageProgressBar.IsIndeterminate = true;
             BackgroundAudioPlayer.Instance.SkipPrevious();
-        }
-
-        private void reviewsImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            string imgUrl = reviewsItemsList.ElementAt(reviews_ListBox.SelectedIndex).ImgUrl;
-            if (imgUrl != "")
-            {
-                NavigationService.Navigate(new Uri("/ImagePage.xaml?imgUrl=" + imgUrl, UriKind.Relative));
-            }
         }
 
         private void playButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
@@ -357,7 +330,7 @@ namespace SynthemaRu
             }
         }
 
-        private void HyperlinkButton_Click_1(object sender, RoutedEventArgs e)
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
                 WebBrowserTask wbt = new WebBrowserTask();
                 wbt.Uri = new Uri("http://synth-radio.ru", UriKind.RelativeOrAbsolute);
@@ -370,10 +343,6 @@ namespace SynthemaRu
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (!App.ViewModel.IsDataLoaded)
-            {
-                App.ViewModel.LoadData();
-            }
         }
 
         private void Pivot_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
@@ -382,7 +351,7 @@ namespace SynthemaRu
             if (MainPivot.SelectedIndex == 0)
             {
                 ApplicationBar.IsVisible = true;
-                DownloadNewsRss(newsUrl);
+                DownloadNewsRss(Constants.NewsUrl);
                 Adverts.Visibility = Visibility.Collapsed;
             }
 
@@ -390,7 +359,7 @@ namespace SynthemaRu
             else if (MainPivot.SelectedIndex == 1)
             {
                 ApplicationBar.IsVisible = true;
-                DownloadReviewsRss(reviewsRssPath);
+                DownloadReviewsRss(Constants.ReviewsRssPath);
                 Adverts.Visibility = Visibility.Collapsed;
             }
 
@@ -429,7 +398,7 @@ namespace SynthemaRu
         }
 
         #endregion
-
+        
         #region App tiles
 
         //void ChangeBackFlipTileData(string backTitle, string backContent, string wideBackContent, string wideBackBackgroundImage, string backBackgroundImage) 
@@ -450,10 +419,40 @@ namespace SynthemaRu
 
         #endregion
 
+        #region AppBar
 
-        // Load data for the ViewModel Items 
+        private void RefreshAppButton_Click_1(object sender, EventArgs e)
+        {
+            if (MainPivot.SelectedIndex == 0) // обновить новости
+            {
+               // DownloadNewsRss(newsUrl);
+            }
+            else if (MainPivot.SelectedIndex == 1) // обновить рецензии
+            {
+               // DownloadReviewsRss(reviewsRssPath);
+            }
+            else if (MainPivot.SelectedIndex == 2) // обновить поиск
+            {
+                //
+            }
+            else if (MainPivot.SelectedIndex == 3) // обновить радио
+            {
+                //
+            }
+            else if (MainPivot.SelectedIndex == 4) // обновить ссылки
+            {
+                //
+            }
+            else if (MainPivot.SelectedIndex == 5) // обновить о программе
+            {
+                //
+            }
+        }
+
+        #endregion
 
         // Sample code for building a localized ApplicationBar
+
         //private void BuildLocalizedApplicationBar()
         //{
         //    // Set the page's ApplicationBar to a new instance of ApplicationBar.

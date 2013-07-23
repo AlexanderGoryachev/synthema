@@ -9,8 +9,6 @@
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:UI="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI"
     x:Class="SynthemaRu.MainPage"
-    mc:Ignorable="d"
-    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
@@ -76,10 +74,10 @@
             <!--Pivot item one-->
             <phone:PivotItem Header="новости">
                 <!--Double line list with text wrapping-->
-                <ListBox x:Name="NewsListBox" Margin="15,0,0,0" SelectionChanged="NewsListBox_SelectionChanged">
+                <ListBox x:Name="NewsListBox" Margin="15,0,0,0" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>                             
+                        <DataTemplate>                            
+                            <StackPanel x:Name="NewsTitleStackPanel" Tap="NewsTitleStackPanel_Tap" >                             
                                 <TextBlock Grid.Row="0" TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,20" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" >
                                     <TextBlock.Foreground>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -96,14 +94,14 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <Image Width="180" Height="180" Grid.Column="0" Source="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="NewsImage_Tap" />
+                                    <Image Source="{Binding ThumbUrl}" Width="180" Height="180" Grid.Column="0" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="NewsImage_Tap" />
 
-                                    <!--StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,20">
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
+                                    <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,20">
+                                        <!--TextBlock TextWrapping="Wrap" Foreground="White">
                                             <Run Text="Label:" FontWeight="Bold" />
                                             <Run Text="{Binding Label}" />
                                         </TextBlock>
@@ -126,13 +124,14 @@
                                         <TextBlock TextWrapping="Wrap" Foreground="White">
                                             <Run Text="Size:" FontWeight="Bold" />
                                             <Run Text="{Binding Size}" />
-                                        </TextBlock>
-                                    </StackPanel-->
+                                        </TextBlock-->
+                                        <TextBlock Text="{Binding Details}" FontSize="24" TextWrapping="Wrap" Foreground="#FFCCCCCC" />
+                                    </StackPanel>
 
-                                    <TextBlock FontSize="24" Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Description}" TextWrapping="Wrap" Foreground="White" />
+                                    <TextBlock Text="{Binding Description}" FontSize="24" Grid.Row="2" Grid.ColumnSpan="2" TextWrapping="Wrap" Foreground="White" />
                                 </Grid>
                                 
-                                <TextBlock Grid.Row="2" TextWrapping="Wrap" Text="{Binding PubDate}" FontSize="18" Margin="0,0,0,40" Foreground="#FFCCCCCC" />
+                                <TextBlock Text="{Binding PubDate}" Grid.Row="2" TextWrapping="Wrap" FontSize="18" Margin="0,0,0,40" Foreground="#FFCCCCCC" />
 
                             </StackPanel>
                         </DataTemplate>
@@ -148,7 +147,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Padding="0,0,0,20" >
+                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Padding="0,0,0,20" >
                                     <TextBlock.Foreground>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                             <GradientStop Color="#FFFFF300" Offset="0"/>
@@ -225,7 +224,7 @@
 
                     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0">
                         <TextBlock Text="96k" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
-                        <toolkit:ToggleSwitch Content="" HorizontalAlignment="Center" Background="#FFFFF300" Checked="ToggleSwitch_Checked_1" Unchecked="ToggleSwitch_Unchecked_1" FontSize="32" />
+                        <toolkit:ToggleSwitch Content="" HorizontalAlignment="Center" Background="#FFFFF300" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked" FontSize="32" />
                         <TextBlock Text="128k" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
                     </StackPanel>
 
@@ -235,7 +234,7 @@
                         <Image Source="Resources/sr4.jpg" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="0,0,0,10" HorizontalAlignment="Center">
                             <TextBlock x:Name="Disclaimer" Text="Аудиопоток предоставлен сайтом" VerticalAlignment="Top" Foreground="Black" />
-                            <HyperlinkButton Content="synth-radio.ru" FontSize="20" VerticalAlignment="Top" Foreground="#FF002980" FontWeight="Bold" Click="HyperlinkButton_Click_1" />
+                            <HyperlinkButton Content="synth-radio.ru" FontSize="20" VerticalAlignment="Top" Foreground="#FF002980" FontWeight="Bold" Click="HyperlinkButton_Click" />
                         </StackPanel>
                     </Grid>
 
