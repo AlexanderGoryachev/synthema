@@ -41,5 +41,20 @@ namespace SynthemaRu
         }
 
         #endregion
+
+        #region AppMethods
+
+        public static string ReplaceHtmlTags(string HtmlString)
+        {
+            HtmlString.Replace("&quot;", "\"");
+            HtmlString.Replace("&nbsp;", " ");
+            HtmlString.Replace("<br>", "\n"); 
+            HtmlString.Replace("<br/>", "\n"); 
+            HtmlString.Replace("<br />", "\n");
+
+            return HtmlString;
+        }
+
+        #endregion
     }
 }

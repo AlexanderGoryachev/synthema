@@ -86,6 +86,8 @@ namespace SynthemaRu
             if (nodes == null)
                 return;
 
+            AppData.NewsItems.Clear();
+
             foreach (HtmlNode node in nodes)
             {
                 var _title = node.SelectSingleNode(@"div[@class='tbh']/h2/a").InnerText;

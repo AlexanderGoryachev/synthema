@@ -18,16 +18,44 @@
         <!--Pivot Control-->
         <phone:Pivot Title=" ">
             <!--Pivot item one-->
-            <phone:PivotItem Header="описание">
+            <phone:PivotItem Header="комментарии">
                 <Grid>
-                    <ScrollViewer>
-                        <Image HorizontalAlignment="Left" VerticalAlignment="Top" Height="240" Width="240"></Image>
-                    </ScrollViewer>
+                    <ListBox x:Name="CommentsListBox">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" 
+                                           Source="{Binding Userpic}" 
+                                           Height="100" Width="100" 
+                                           Stretch="Fill" 
+                                           VerticalAlignment="Top" 
+                                           HorizontalAlignment="Left" 
+                                           Margin="0,5,20,0" />
+                                    <Grid Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock VerticalAlignment="Top" FontSize="24" TextWrapping="Wrap" Margin="0,0,0,10">
+                                            <Run Text="{Binding Username}" FontWeight="Bold"/>
+                                            <Run Text="{Binding Date}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="2" Text="{Binding Text}" FontSize="24" TextWrapping="Wrap" VerticalAlignment="Top" />
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </Grid>
             </phone:PivotItem>
 
             <!--Pivot item two-->
-            <phone:PivotItem Header="комментарии">
+            <phone:PivotItem Header="описание">
                 <Grid/>
             </phone:PivotItem>
         </phone:Pivot>
