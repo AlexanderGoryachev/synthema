@@ -63,11 +63,11 @@ namespace SynthemaRu
                 {
                     var _username = node.SelectSingleNode(@"div[@class='comtext']/b").InnerText;
                     var _userpic = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='avatar']/img").GetAttributeValue("src", "");
-                    var _text = node.SelectSingleNode(@"div[@class='comtext']/div").InnerText.Replace("&quot;", "\"");
-                    var _date = node.SelectSingleNode(@"div[@class='comtext']/text()").InnerText.Replace("&nbsp;", "");
+                    var _text = node.SelectSingleNode(@"div[@class='comtext']/div").InnerText;
+                    var _date = node.SelectSingleNode(@"div[@class='comtext']/text()").InnerText;
 
-                    //_text = AppData.ReplaceHtmlTags(_text);
-                    //_date = AppData.ReplaceHtmlTags(_date);
+                    _text = HttpUtility.HtmlDecode(_text);
+                    _date = _date.Replace("&nbsp;", "");
 
                     AppData.Comments.Add(new AppData.Comment
                     {

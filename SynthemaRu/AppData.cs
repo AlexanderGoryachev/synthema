@@ -8,13 +8,13 @@ namespace SynthemaRu
 {
     class AppData
     {
-        #region News
+        #region Main
 
-        public static string NewsString = string.Empty;
+        public static string MainString = string.Empty;
 
-        public static List<NewsItem> NewsItems = new List<NewsItem>();
+        public static List<MainItem> MainItems = new List<MainItem>();
 
-        public class NewsItem
+        public class MainItem
         {
             public string Title { get; set; }
             public string Link { get; set; }
@@ -28,7 +28,23 @@ namespace SynthemaRu
 
         #endregion
 
-        #region NewsDetail
+        #region News
+
+        public static List<NewsItem> NewsItems = new List<NewsItem>();
+
+        public class NewsItem
+        {
+            public string Title { get; set; }
+            public string Link { get; set; }
+            public string ImgUrl { get; set; }
+            public string ThumbUrl { get; set; }
+            public string Description { get; set; }
+            public string PubDate { get; set; }
+        }
+
+        #endregion
+
+        #region MainDetail
 
         public static List<Comment> Comments = new List<Comment>();
 

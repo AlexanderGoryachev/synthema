@@ -47,37 +47,41 @@ namespace SynthemaRu
             //BuildLocalizedApplicationBar();
         }
         
-        #region News
+        #region Main
         
-        void DownloadNews(string Path)
+        void DownloadMain(string Path)
         {
-            WebClient news = new WebClient();
-            news.Encoding = new Windows1251Encoding();
-            news.DownloadStringAsync(new Uri(Path));
-            news.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadNewsStringCompleted);
+            WebClient mainClient = new WebClient();
+            mainClient.Encoding = new Windows1251Encoding();
+            mainClient.DownloadStringAsync(new Uri(Path));
+            mainClient.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadMainStringCompleted);
             TopPageProgressBar.IsIndeterminate = true;
         }
 
-        void DownloadNewsStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        void DownloadMainStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             if (e.Error != null)
                 return;
 
-            if (AppData.NewsString.Equals(e.Result) == false)
+            if (AppData.MainString.Equals(e.Result) == false)
             {
-                AppData.NewsString = e.Result;
+                AppData.MainString = e.Result;
+                ParseMainHtml(e.Result);
+                MainListBox.ItemsSource = AppData.MainItems;
+
                 ParseNewsHtml(e.Result);
                 NewsListBox.ItemsSource = AppData.NewsItems;
             }
             else
             {
-                NewsListBox.ItemsSource = AppData.NewsItems;                
+                MainListBox.ItemsSource = AppData.MainItems;
+                NewsListBox.ItemsSource = AppData.NewsItems;          
             }
 
             TopPageProgressBar.IsIndeterminate = false;
         }
 
-        private void ParseNewsHtml(string HtmlString)
+        private void ParseMainHtml(string HtmlString)
         {
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(HtmlString);
@@ -86,31 +90,28 @@ namespace SynthemaRu
             if (nodes == null)
                 return;
 
-            AppData.NewsItems.Clear();
+            AppData.MainItems.Clear();
 
             foreach (HtmlNode node in nodes)
             {
                 var _title = node.SelectSingleNode(@"div[@class='tbh']/h2/a").InnerText;
                 var _link = node.SelectSingleNode(@"div[@class='tbh']/h2/a").GetAttributeValue("href", "http://");
 
-                var _thumbUrl = "";
-                try { _thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/a/img").GetAttributeValue("src", ""); }
-                catch
-                {
-                    try { _thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]/img").GetAttributeValue("src", ""); }
-                    catch { }
-                }
+                var _thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]//img").GetAttributeValue("src", "");
 
                 var _imgUrl = "";
                 try { _imgUrl = node.SelectSingleNode(@"div[@class='news']/div/div[1]/a").GetAttributeValue("href", ""); }
                 catch { }
 
                 var _details = node.SelectSingleNode(@"div[@class='news']/div/div[2]").LastChild.InnerHtml.Replace("<br>", "\n");
-
                 var _description = node.SelectSingleNode(@"div[@class='news']/div").LastChild.InnerText;
-                var _pubDate = node.SelectSingleNode(@"div[@class='tbnfo']").InnerText.Replace("&nbsp;", "");
+                var _pubDate = node.SelectSingleNode(@"div[@class='tbnfo']").InnerText;
 
-                AppData.NewsItems.Add(new AppData.NewsItem
+                _details = HttpUtility.HtmlDecode(_details);
+                _description = HttpUtility.HtmlDecode(_description);
+                _pubDate = HttpUtility.HtmlDecode(_pubDate);
+
+                AppData.MainItems.Add(new AppData.MainItem
                 {
                     Title = _title,
                     Link = _link,
@@ -123,13 +124,81 @@ namespace SynthemaRu
             }
         }
 
-        private void NewsListBox_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private void MainListBox_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            if (NewsListBox.SelectedItem != null)
+            if (MainListBox.SelectedItem != null)
             {
                 WebBrowserTask task = new WebBrowserTask();
-                task.Uri = new Uri(AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
+                task.Uri = new Uri(AppData.MainItems.ElementAt(MainListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
                 task.Show();
+            }
+        }
+
+        private void MainImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            string imgUrl = AppData.MainItems.ElementAt(MainListBox.SelectedIndex).ImgUrl;
+            if (imgUrl != "")
+            {
+                NavigationService.Navigate(new Uri("/ImagePage.xaml?imgUrl=" + imgUrl, UriKind.Relative));
+            }
+        }
+
+        private void MainStackPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (MainListBox.SelectedItem != null)
+            {
+                //WebBrowserTask task = new WebBrowserTask();
+                //task.Uri = new Uri(AppData.MainItems.ElementAt(MainListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
+                //task.Show();
+
+                var mainDetailPath = AppData.MainItems.ElementAt(MainListBox.SelectedIndex).Link;
+                NavigationService.Navigate(new Uri("/MainDetail.xaml?mainDetailPath=" + mainDetailPath, UriKind.Relative));
+            }
+        }
+        
+        #endregion
+
+        #region News
+
+        private void ParseNewsHtml(string HtmlString)
+        {
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(HtmlString);
+
+            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(@".//div[@class='col2-3'][1]/div[@class='sceneCol23c']/div[@class='sceneNews']");
+            if (nodes == null)
+                return;
+
+            AppData.NewsItems.Clear();
+
+            foreach (HtmlNode node in nodes)
+            {
+                var _title = node.SelectSingleNode(@"div[@class='title']/h2/a").InnerText;
+                var _link = node.SelectSingleNode(@"div[@class='title']/h2/a").GetAttributeValue("href", "http://");
+
+                var _thumbUrl = node.SelectSingleNode(@"div[@class='newsm']//img").GetAttributeValue("src", "");
+                
+                var _imgUrl = node.SelectSingleNode(@"div[@class='newsm']//a").GetAttributeValue("href", "");
+                
+                var _description = string.Empty;
+                try { _description = node.SelectSingleNode(@"div[@class='newsm']/text()").InnerText; }
+                catch { }
+
+                _description = HttpUtility.HtmlDecode(_description);
+
+                // костыль, помогающий обойти косяк в CMS, лишний раз приписывающий BaseUrl к относительному пути до картинки
+                // т.е. иногда Url выглядит так: http://www.synthema.ruhttp://www.synthema.ru/uploads/posts/2013-06/thumbs/1371912912_war.jpg
+                _thumbUrl = _thumbUrl.Replace(Constants.BaseUrl, string.Empty);
+                _thumbUrl = Constants.BaseUrl + _thumbUrl;
+
+                AppData.NewsItems.Add(new AppData.NewsItem
+                {
+                    Title = _title,
+                    Link = _link,
+                    ImgUrl = _imgUrl,
+                    ThumbUrl = _thumbUrl,
+                    Description = _description,
+                });
             }
         }
 
@@ -142,19 +211,6 @@ namespace SynthemaRu
             }
         }
 
-        private void NewsStackPanel_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            if (NewsListBox.SelectedItem != null)
-            {
-                //WebBrowserTask task = new WebBrowserTask();
-                //task.Uri = new Uri(AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link, UriKind.RelativeOrAbsolute);
-                //task.Show();
-
-                var newsDetailPath = AppData.NewsItems.ElementAt(NewsListBox.SelectedIndex).Link;
-                NavigationService.Navigate(new Uri("/NewsDetail.xaml?newsDetailPath=" + newsDetailPath, UriKind.Relative));
-            }
-        }
-        
         #endregion
 
         #region Reviews
@@ -352,16 +408,21 @@ namespace SynthemaRu
 
         private void Pivot_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            // News
+            // Main
             if (MainPivot.SelectedIndex == 0)
             {
                 ApplicationBar.IsVisible = true;
-                DownloadNews(Constants.BaseUrl);
+                DownloadMain(Constants.BaseUrl);
                 Adverts.Visibility = Visibility.Collapsed;
             }
-
-            // Reviews
+            // news
             else if (MainPivot.SelectedIndex == 1)
+            {
+                ApplicationBar.IsVisible = true;
+                Adverts.Visibility = Visibility.Collapsed;
+            }
+            // Reviews
+            else if (MainPivot.SelectedIndex == 2)
             {
                 ApplicationBar.IsVisible = true;
                 DownloadReviewsRss(Constants.ReviewsRssPath);
@@ -369,14 +430,14 @@ namespace SynthemaRu
             }
 
             // Search
-            else if (MainPivot.SelectedIndex == 2) 
+            else if (MainPivot.SelectedIndex == 3) 
             {
                 ApplicationBar.IsVisible = true;
                 Adverts.Visibility = Visibility.Visible;
             }
 
             // Synth Radio
-            else if (MainPivot.SelectedIndex == 3)
+            else if (MainPivot.SelectedIndex == 4)
             {
                 ApplicationBar.IsVisible = false;
                 Adverts.Visibility = Visibility.Visible;
@@ -388,14 +449,14 @@ namespace SynthemaRu
             }
 
             // Links
-            else if (MainPivot.SelectedIndex == 4)
+            else if (MainPivot.SelectedIndex == 5)
             {
                 ApplicationBar.IsVisible = false;
                 Adverts.Visibility = Visibility.Visible;
             }
 
             // About
-            else if (MainPivot.SelectedIndex == 5)
+            else if (MainPivot.SelectedIndex == 6)
             {
                 ApplicationBar.IsVisible = false;
                 Adverts.Visibility = Visibility.Visible;
@@ -428,27 +489,31 @@ namespace SynthemaRu
 
         private void RefreshAppButton_Click_1(object sender, EventArgs e)
         {
-            if (MainPivot.SelectedIndex == 0) // обновить новости
+            if (MainPivot.SelectedIndex == 0) // обновить главную
             {
-               // DownloadNewsRss(newsUrl);
+                // DownloadMainRss(mainUrl);
             }
-            else if (MainPivot.SelectedIndex == 1) // обновить рецензии
+            if (MainPivot.SelectedIndex == 1) // обновить новости
+            {
+                // DownloadMainRss(mainUrl);
+            }
+            else if (MainPivot.SelectedIndex == 2) // обновить рецензии
             {
                // DownloadReviewsRss(reviewsRssPath);
             }
-            else if (MainPivot.SelectedIndex == 2) // обновить поиск
+            else if (MainPivot.SelectedIndex == 3) // обновить поиск
             {
                 //
             }
-            else if (MainPivot.SelectedIndex == 3) // обновить радио
+            else if (MainPivot.SelectedIndex == 4) // обновить радио
             {
                 //
             }
-            else if (MainPivot.SelectedIndex == 4) // обновить ссылки
+            else if (MainPivot.SelectedIndex == 5) // обновить ссылки
             {
                 //
             }
-            else if (MainPivot.SelectedIndex == 5) // обновить о программе
+            else if (MainPivot.SelectedIndex == 6) // обновить о программе
             {
                 //
             }

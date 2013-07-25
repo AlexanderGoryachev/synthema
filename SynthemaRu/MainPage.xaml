@@ -72,12 +72,12 @@
         <!--Pivot Control-->
         <phone:Pivot x:Name="MainPivot" Title=" " SelectionChanged="Pivot_SelectionChanged_1" Foreground="White" >
             <!--Pivot item one-->
-            <phone:PivotItem Header="новости">
+            <phone:PivotItem Header="главная">
                 <!--Double line list with text wrapping-->
-                <ListBox x:Name="NewsListBox" Margin="15,0,0,0" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
+                <ListBox x:Name="MainListBox" Margin="15,0,0,0" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
-                        <DataTemplate>                            
-                            <StackPanel x:Name="NewsStackPanel" Tap="NewsStackPanel_Tap" >                             
+                        <DataTemplate>
+                            <StackPanel x:Name="MainStackPanel" Tap="MainStackPanel_Tap" >                             
                                 <TextBlock Grid.Row="0" TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,20" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" >
                                     <TextBlock.Foreground>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -98,33 +98,9 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <Image Source="{Binding ThumbUrl}" Width="180" Height="180" Grid.Column="0" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="NewsImage_Tap" />
+                                    <Image Source="{Binding ThumbUrl}" Width="180" Height="180" Grid.Column="0" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="MainImage_Tap" />
 
                                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,20">
-                                        <!--TextBlock TextWrapping="Wrap" Foreground="White">
-                                            <Run Text="Label:" FontWeight="Bold" />
-                                            <Run Text="{Binding Label}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                            <Run Text="Format:" FontWeight="Bold" />
-                                            <Run Text="{Binding Format}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                            <Run Text="Country:" FontWeight="Bold" />
-                                            <Run Text="{Binding Country}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                            <Run Text="Style:" FontWeight="Bold" />
-                                            <Run Text="{Binding Style}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                            <Run Text="Quality:" FontWeight="Bold" />
-                                            <Run Text="{Binding Quality}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                            <Run Text="Size:" FontWeight="Bold" />
-                                            <Run Text="{Binding Size}" />
-                                        </TextBlock-->
                                         <TextBlock Text="{Binding Details}" FontSize="24" TextWrapping="Wrap" Foreground="#FFCCCCCC" />
                                     </StackPanel>
 
@@ -140,10 +116,51 @@
                 
             </phone:PivotItem>
 
+            <phone:PivotItem Header="новости">
+                <!--Double line list with text wrapping-->
+                <ListBox x:Name="NewsListBox" Margin="15,0,0,0" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel x:Name="NewsStackPanel" >
+                                <TextBlock Grid.Row="0" TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,20" 
+                                           VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" >
+                                    <TextBlock.Foreground>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFFFF300" Offset="0"/>
+                                            <GradientStop Color="#FFE69D00" Offset="1"/>
+                                            <GradientStop Color="#FFEAB500" Offset="0.713"/>
+                                        </LinearGradientBrush>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+
+                                <Grid Grid.Row="1" VerticalAlignment="Top" Margin="0,0,0,20" >
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Image Source="{Binding ThumbUrl}" Width="240" Height="240" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Center" Tap="NewsImage_Tap" />
+
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,20">
+                                        <TextBlock Text="{Binding Details}" FontSize="24" TextWrapping="Wrap" Foreground="#FFCCCCCC" />
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding Description}" FontSize="24" Grid.Row="2" TextWrapping="Wrap" Foreground="White" />
+                                </Grid>
+
+                                <TextBlock Text="{Binding PubDate}" Grid.Row="2" TextWrapping="Wrap" FontSize="18" Margin="0,0,0,40" Foreground="#FFCCCCCC" />
+
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+            </phone:PivotItem>
+
             <!--Pivot item two-->
             <phone:PivotItem Header="рецензии">
                 <!--Double line list no text wrapping-->
-                <ListBox  x:Name="reviews_ListBox" Tap="NewsListBox_Tap" Margin="15,0,0,0" >
+                <ListBox  x:Name="reviews_ListBox" Tap="MainListBox_Tap" Margin="15,0,0,0" >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>

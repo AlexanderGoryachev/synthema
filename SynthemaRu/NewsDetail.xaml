@@ -41,11 +41,11 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
-                                        <TextBlock VerticalAlignment="Top" FontSize="24" TextWrapping="Wrap" Margin="0,0,0,10">
+                                        <TextBlock VerticalAlignment="Top" FontSize="24" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,10">
                                             <Run Text="{Binding Username}" FontWeight="Bold"/>
                                             <Run Text="{Binding Date}"/>
                                         </TextBlock>
-                                        <TextBlock Grid.Row="2" Text="{Binding Text}" FontSize="24" TextWrapping="Wrap" VerticalAlignment="Top" />
+                                        <TextBlock Grid.Row="2" Text="{Binding Text}" FontSize="24" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Top" />
                                     </Grid>
                                 </Grid>
                             </DataTemplate>
