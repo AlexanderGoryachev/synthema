@@ -22,32 +22,32 @@ namespace SynthemaRu
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            string newsDetailPath = NavigationContext.QueryString["newsDetailPath"].ToString();
-            DownloadNewsDetail(newsDetailPath);
+            string mainDetailPath = NavigationContext.QueryString["mainDetailPath"].ToString();
+            DownloadMainDetail(mainDetailPath);
         }
 
-        private void DownloadNewsDetail(string Path)
+        private void DownloadMainDetail(string Path)
         {
             WebClient newsDetails = new WebClient();
             newsDetails.Encoding = new Windows1251Encoding();
             newsDetails.DownloadStringAsync(new Uri(Path));
-            newsDetails.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadNewsDetailStringCompleted);
+            newsDetails.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadMainDetailStringCompleted);
             TopPageProgressBar.IsIndeterminate = true;
         }
 
-        private void DownloadNewsDetailStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        private void DownloadMainDetailStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             if (e.Error != null)
                 return;
 
-            ParseNewsDetailHtml(e.Result);
+            ParseMainDetailHtml(e.Result);
 
             CommentsListBox.ItemsSource = AppData.Comments;
 
             TopPageProgressBar.IsIndeterminate = false;
         }
 
-        private void ParseNewsDetailHtml(string HtmlString)
+        private void ParseMainDetailHtml(string HtmlString)
         {
             AppData.Comments.Clear();
 
@@ -81,7 +81,28 @@ namespace SynthemaRu
             catch
             {
                 return;
-            }            
+            }
+
+            HtmlNode FullDescriptionBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[1]/div[3]");
+
+            var _details    = FullDescriptionBaseNode.SelectSingleNode("div/div[2]/b[1]").InnerHtml;
+            var _link       = FullDescriptionBaseNode.SelectSingleNode("div//b/a").GetAttributeValue("href", "");
+            var _link_text  = FullDescriptionBaseNode.SelectSingleNode("div//b/a").InnerText;
+            var _promotext  = FullDescriptionBaseNode.SelectSingleNode("div/div[text()][1]").InnerHtml;
+            var _tracklist  = FullDescriptionBaseNode.SelectSingleNode("div/div[b = 'Tracklist:']").InnerHtml;
+
+            _details    = HttpUtility.HtmlDecode(_details);
+            _promotext  = HttpUtility.HtmlDecode(_promotext);
+            _tracklist  = HttpUtility.HtmlDecode(_tracklist);
+
+            _details    = _details.Replace("<br>", "\n");
+            _promotext  = _promotext.Replace("<br>", "\n");
+            _tracklist  = _tracklist.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
+
+            DetailsTextBlock.Text =   _details;
+            LinkTextBlock.Text =      _link_text;
+            PromotextTextBlock.Text = _promotext;
+            TracklistTextBlock.Text = _tracklist;
         }
     }
 }

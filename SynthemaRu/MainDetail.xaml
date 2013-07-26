@@ -15,9 +15,20 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <!--Pivot Control-->
-        <phone:Pivot Title=" ">
-            <!--Pivot item one-->
+        <phone:Pivot>
+            <!--Pivot Control-->
+            <phone:PivotItem Header="описание">
+                <ScrollViewer>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock x:Name="DetailsTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                        <TextBlock x:Name="LinkTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                        <TextBlock x:Name="PromotextTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                        <TextBlock x:Name="TracklistTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </phone:PivotItem>
+
+            <!--Pivot item two-->
             <phone:PivotItem Header="комментарии">
                 <Grid>
                     <ListBox x:Name="CommentsListBox">
@@ -52,11 +63,6 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Grid>
-            </phone:PivotItem>
-
-            <!--Pivot item two-->
-            <phone:PivotItem Header="описание">
-                <Grid/>
             </phone:PivotItem>
         </phone:Pivot>
         

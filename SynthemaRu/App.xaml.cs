@@ -10,6 +10,11 @@ using SynthemaRu.Resources;
 using Microsoft.Phone.BackgroundAudio;
 using System.IO.IsolatedStorage;
 using System.IO;
+using Newtonsoft.Json;
+using Windows.Storage;
+using System.Collections.Generic;
+using MSPToolkit.Encodings;
+using System.Threading.Tasks;
 
 namespace SynthemaRu
 {
@@ -66,6 +71,11 @@ namespace SynthemaRu
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            var jsonString = LoadFileFromIsoStorage(Constants.MainItemsStorageFileName);
+            //if (jsonString.Equals("[null]") == false)
+            //{
+            //    AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString);
+            //}
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -73,14 +83,18 @@ namespace SynthemaRu
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
             // Ensure that application state is restored appropriately
-            AppData.MainString = GetHtmlStringFromIsolatedStorage(Constants.StorageNewsHtmlName);
+            //var jsonString = LoadFileFromIsoStorage("MainItems.json");
+            //if (jsonString.Equals("[null]") == false)
+            //{
+            //    AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString);
+            //}
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
-        private void Application_Deactivated(object sender, DeactivatedEventArgs e)
+        private async void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
-            SaveHtmlStringToIsolatedStorage(Constants.StorageNewsHtmlName);
+            SerializeAndSaveFileToIsoStorage(AppData.MainItems, Constants.MainItemsStorageFileName);
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
@@ -88,29 +102,31 @@ namespace SynthemaRu
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
             // Ensure that required application state is persisted here.
-            SaveHtmlStringToIsolatedStorage(Constants.StorageNewsHtmlName);
+            SerializeAndSaveFileToIsoStorage(AppData.MainItems, Constants.MainItemsStorageFileName);
         }
 
-        private void SaveHtmlStringToIsolatedStorage(string HtmlString)
+        private void SerializeAndSaveFileToIsoStorage(object inputFileName, string jsonFileName)
         {
-            var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(Constants.StorageNewsHtmlName, FileMode.OpenOrCreate);
-            if (file.Equals(HtmlString) == false)
+            string jsonResult = JsonConvert.SerializeObject(inputFileName, new JsonSerializerSettings()
             {
-                var fileWriter = new StreamWriter(file);
-                fileWriter.WriteAsync(HtmlString);
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+
+            var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(jsonFileName, FileMode.OpenOrCreate);
+            var fileWriter = new StreamWriter(file).WriteAsync(jsonResult);
+        }
+
+        private async Task<string> LoadFileFromIsoStorage(string jsonFileName)
+        {
+            var jsonString = string.Empty;
+            if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(jsonFileName))
+            {
+                var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(jsonFileName, FileMode.Open, FileAccess.Read);
+                jsonString = await new StreamReader(file).ReadToEndAsync();
+                //IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(jsonFileName);
             }
-        }
-
-        private string GetHtmlStringFromIsolatedStorage(string HtmlStringFileName)
-        {
-            var HtmlString = "";
-            if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(HtmlStringFileName))
-            {
-                var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(HtmlStringFileName, FileMode.Open);
-                var fileReader = new StreamReader(file);
-                HtmlString = fileReader.ReadToEnd();
-            }            
-            return HtmlString;
+            else jsonString = "[null]";
+            return jsonString;
         }
 
         // Code to execute if a navigation fails

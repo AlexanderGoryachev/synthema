@@ -9,7 +9,7 @@ namespace SynthemaRu
     class Constants
     {
         public const string BaseUrl = @"http://www.synthema.ru";
-        public const string StorageNewsHtmlName = "LatestNewsHtml";
+        public const string MainItemsStorageFileName = "MainItems.json";
 
         public const string ReviewsRssPath = @"http://www.synthema.ru/reviews/rss.xml";
     }

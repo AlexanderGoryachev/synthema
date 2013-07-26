@@ -36,6 +36,8 @@ namespace SynthemaRu
         {
             InitializeComponent();
 
+            MainListBox.ItemsSource = AppData.MainItems;
+
             BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(Instance_PlayStateChanged);
 
             playBmp.UriSource = new Uri(@"Resources/play.png", UriKind.Relative);
