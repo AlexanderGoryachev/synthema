@@ -6,71 +6,389 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:local="clr-namespace:ControlTiltEffect"
+    local:TiltEffect.IsTiltEnabled="True"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="false">
+    Foreground="{StaticResource PhoneForegroundBrush}" 
+    SupportedOrientations="Portrait"  Orientation="Portrait">
 
+    <phone:PhoneApplicationPage.Resources>
+        <Style x:Key="HyperlinkButtonWrappingStyle"
+        TargetType="HyperlinkButton">
+            <Setter Property="Foreground"
+            Value="{StaticResource PhoneForegroundBrush}" />
+            <Setter Property="Background"
+            Value="Transparent" />
+            <Setter Property="FontSize"
+            Value="{StaticResource PhoneFontSizeMedium}" />
+            <Setter Property="Padding"
+            Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="HyperlinkButton">
+                        <Border Background="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />                                        
+                                    <VisualState x:Name="MouseOver" />
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                           Storyboard.TargetName="TextElement">
+                                                <DiscreteObjectKeyFrame KeyTime="0"
+                                                                        Value="#FFFFC800" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                    Storyboard.TargetName="TextElement">
+                                                <DiscreteObjectKeyFrame KeyTime="0"
+                                                                Value="{StaticResource PhoneDisabledBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border Background="{TemplateBinding Background}"
+                            Margin="{StaticResource PhoneHorizontalMargin}"
+                            Padding="{TemplateBinding Padding}">
+                                <TextBlock x:Name="TextElement"
+                                    HorizontalAlignment="Left"
+                                    Text="{TemplateBinding Content}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    TextWrapping="Wrap" />
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HyperlinkButtonSimilarLinksStyle"
+        TargetType="HyperlinkButton">
+            <Setter Property="Foreground"
+            Value="{StaticResource PhoneForegroundBrush}" />
+            <Setter Property="Background"
+            Value="Transparent" />
+            <Setter Property="FontSize"
+            Value="{StaticResource PhoneFontSizeMedium}" />
+            <Setter Property="Padding"
+            Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="HyperlinkButton">
+                        <Border Background="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="MouseOver" />
+                                    <VisualState x:Name="Pressed"/>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                    Storyboard.TargetName="TitleText">
+                                                <DiscreteObjectKeyFrame KeyTime="0"
+                                                                Value="{StaticResource PhoneDisabledBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                    Storyboard.TargetName="AlbumText">
+                                                <DiscreteObjectKeyFrame KeyTime="0"
+                                                                Value="{StaticResource PhoneDisabledBrush}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border Background="{TemplateBinding Background}"
+                                    Margin="{StaticResource PhoneHorizontalMargin}"
+                                    Padding="{TemplateBinding Padding}">
+                                <StackPanel Orientation="Horizontal" 
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Margin="-12,0,0,0">
+                                    <StackPanel Width="3"
+                                                VerticalAlignment="Stretch"
+                                                Background="#FFFFC800"
+                                                Margin="2,0,12,0">
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock x:Name="TitleText"
+                                                   HorizontalAlignment="Left"
+                                                   Text="{TemplateBinding Content}"
+                                                   FontSize="36"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="#FFFFC800"/>
+                                        <TextBlock x:Name="AlbumText"
+                                                   HorizontalAlignment="Left"
+                                                   Text="{TemplateBinding Tag}"
+                                                   FontSize="24"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="#FFFFFFFF"
+                                                   Margin="0,0,0,8" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </phone:PhoneApplicationPage.Resources>
+    
+    <toolkit:TransitionService.NavigationInTransition>
+        <toolkit:NavigationInTransition>
+            <toolkit:NavigationInTransition.Backward>
+                <toolkit:SlideTransition Mode="SlideUpFadeIn" />
+            </toolkit:NavigationInTransition.Backward>
+            <toolkit:NavigationInTransition.Forward>
+                <toolkit:SlideTransition Mode="SlideUpFadeIn"/>
+            </toolkit:NavigationInTransition.Forward>
+        </toolkit:NavigationInTransition>
+    </toolkit:TransitionService.NavigationInTransition>
+    
+    <toolkit:TransitionService.NavigationOutTransition>
+        <toolkit:NavigationOutTransition>
+            <toolkit:NavigationOutTransition.Backward>
+                <toolkit:SlideTransition Mode="SlideDownFadeOut"/>
+            </toolkit:NavigationOutTransition.Backward>
+            <toolkit:NavigationOutTransition.Forward>
+                <toolkit:SlideTransition Mode="SlideDownFadeOut"/>
+            </toolkit:NavigationOutTransition.Forward>
+        </toolkit:NavigationOutTransition>
+    </toolkit:TransitionService.NavigationOutTransition>
+    
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized" BackgroundColor="Black" ForegroundColor="White">
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem Text="Открыть в браузере" Click="OpenInBrowser_Click"/>
+            </shell:ApplicationBar.MenuItems>
+            <!--<shell:ApplicationBarIconButton IconUri="/Assets/AppBar/feature.search.png" Text="Открыть в браузере"/>-->
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+    
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
-        <phone:Pivot>
+    <Grid x:Name="LayoutRoot">
+        <Grid.Background>
+            <ImageBrush ImageSource="/Resources/bg.png" Stretch="None"/>
+        </Grid.Background>
+        <phone:Pivot Title=" ">
             <!--Pivot Control-->
-            <phone:PivotItem Header="описание">
-                <ScrollViewer>
+            <phone:PivotItem Header="информация">
+                <ScrollViewer Margin="12,0,0,0">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock x:Name="DetailsTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
-                        <TextBlock x:Name="LinkTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
-                        <TextBlock x:Name="PromotextTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
-                        <TextBlock x:Name="TracklistTextBlock" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                        <TextBlock x:Name="GroupTitleTextBlock" 
+                                   FontFamily="Segoe WP Light"
+                                   FontSize="36"
+                                   Foreground="#FFFFC800"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="AlbumTitleTextBlock" 
+                                   FontFamily="Segoe WP Light"
+                                   FontSize="24"
+                                   Foreground="#FFFFFFFF"
+                                   TextWrapping="Wrap" 
+                                   Margin="0,0,0,24" />
+                        
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,24">
+                            <StackPanel x:Name="BackgroundCoverImage"
+                                        Background="Black"
+                                        Orientation="Horizontal"
+                                        Margin="0,0,12,0"
+                                        MinHeight="210"
+                                        HorizontalAlignment="Left"
+                                        Visibility="Collapsed">                                
+                                <Image x:Name="CoverImage"                                    
+                                       Width="210"
+                                       VerticalAlignment="Center" />
+                            </StackPanel>
+                            <ListBox x:Name="LinksListBox"
+                                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                     Margin="0,0,0,24"
+                                     Width="210" >
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                Width="432">
+                                            <StackPanel Width="3"
+                                                    VerticalAlignment="Stretch"
+                                                    Background="#FFFFC800"
+                                                    Margin="2,0,0,12">
+                                            </StackPanel>
+                                            <HyperlinkButton Style="{StaticResource HyperlinkButtonWrappingStyle}"
+                                                         Content="{Binding Value}"
+                                                         NavigateUri="{Binding Key}"
+                                                         Width="204"
+                                                         TargetName="_blank"
+                                                         Margin="0,0,0,12">
+                                            </HyperlinkButton>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                        </StackPanel>
+                        
+                        <TextBlock x:Name="PromotextTextBlock" 
+                                   FontSize="24" 
+                                   TextWrapping="Wrap" 
+                                   TextTrimming="WordEllipsis"
+                                   FontFamily="Segoe WP Light" 
+                                   Margin="0,0,0,24" />
                     </StackPanel>
                 </ScrollViewer>
             </phone:PivotItem>
 
-            <!--Pivot item two-->
-            <phone:PivotItem Header="комментарии">
+            <phone:PivotItem Header="детали">
                 <Grid>
-                    <ListBox x:Name="CommentsListBox">
+                    <ListBox x:Name="DetailsListBox" Margin="12,0,0,0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,20">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Image Grid.Column="0" 
-                                           Source="{Binding Userpic}" 
-                                           Height="100" Width="100" 
-                                           Stretch="Fill" 
-                                           VerticalAlignment="Top" 
-                                           HorizontalAlignment="Left" 
-                                           Margin="0,5,20,0" />
-                                    <Grid Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="*" />
-                                        </Grid.RowDefinitions>
-                                        <TextBlock VerticalAlignment="Top" FontSize="24" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,10">
-                                            <Run Text="{Binding Username}" FontWeight="Bold"/>
-                                            <Run Text="{Binding Date}"/>
-                                        </TextBlock>
-                                        <TextBlock Grid.Row="2" Text="{Binding Text}" FontSize="24" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Top" />
-                                    </Grid>
-                                </Grid>
+                                <StackPanel Orientation="Vertical"
+                                            Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding Key}"
+                                               Foreground="#FFFFC800"
+                                               FontFamily="Segoe WP Light"
+                                               FontSize="36"/>
+                                    <TextBlock Grid.Column="1"
+                                               Foreground="White"
+                                               FontSize="24" 
+                                               TextWrapping="Wrap"
+                                               FontFamily="Segoe WP Light"
+                                               Text="{Binding Value}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Grid>
             </phone:PivotItem>
+            
+            <phone:PivotItem Header="треклист">
+                <Grid>
+                    <ListBox x:Name="TracklistListBox" Margin="12,0,0,0" local:TiltEffect.SuppressTilt="True">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical"
+                                            Margin="0,0,12,0">
+                                    <Grid Width="432">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Key}"
+                                                   Foreground="#FFFFC800"
+                                                   FontFamily="Segoe WP Light"
+                                                   Margin="0,-4,12,0"
+                                                   FontSize="36"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Foreground="White"
+                                                   FontSize="24" 
+                                                   TextWrapping="Wrap"
+                                                   FontFamily="Segoe WP Light"
+                                                   Text="{Binding Value}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </phone:PivotItem>
+
+            <!--Pivot item two-->
+            <phone:PivotItem Header="комментарии">
+                <Grid>
+                    <TextBlock x:Name="NoCommentsTextBlock"                                
+                               Text="Комментариев нет" 
+                               Visibility="Collapsed" 
+                               FontFamily="Segoe WP Light"
+                               FontSize="24"
+                               HorizontalAlignment="Center"/>
+                    <ListBox x:Name="CommentsListBox" Margin="12,0,0,0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,0,0,36">
+                                    <Image Source="{Binding Userpic}" 
+                                           Height="99" 
+                                           Width="99" 
+                                           Stretch="Fill" 
+                                           VerticalAlignment="Top" 
+                                           HorizontalAlignment="Left" />
+                                    <StackPanel Orientation="Vertical" 
+                                                HorizontalAlignment="Left"
+                                                Margin="12,0,0,0">
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Left"
+                                                    Width="321"                                             
+                                                    Margin="0,-8,0,0">
+                                            <TextBlock Width="321" 
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Top"
+                                                       FontSize="24" 
+                                                       Margin="0,0,0,12">
+                                                <Run Text="{Binding Username}" Foreground="#FFFFC800" FontSize="24" />
+                                                <Run Text="{Binding Date}" Foreground="#FFCCCCCC" FontSize="24" FontFamily="Segoe WP Light" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Text}"
+                                                   VerticalAlignment="Top"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="White"
+                                                   Margin="0,-8,0,0"
+                                                   Width="321"
+                                                   FontSize="24" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>                    
+                </Grid>             
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="похожие">
+                <Grid>
+                    <TextBlock x:Name="NoSimilarTextBlock"                                
+                               Text="Похожих альбомов нет" 
+                               Visibility="Collapsed" 
+                               FontFamily="Segoe WP Semibold"
+                               FontSize="24"
+                               HorizontalAlignment="Center"/>
+                    <ListBox x:Name="SimilarListBox" Margin="12,0,0,0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,0,12,0"
+                                            Width="432">
+                                    <HyperlinkButton
+                                        Style="{StaticResource HyperlinkButtonSimilarLinksStyle}"
+                                        Content="{Binding GroupTitle}"
+                                        Tag="{Binding AlbumTitle}"
+                                        NavigateUri="{Binding Url}"
+                                        FontFamily="Segoe WP Light"
+                                        Width="427"
+                                        Margin="0,0,0,12">
+                                    </HyperlinkButton>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </phone:PivotItem>
+
         </phone:Pivot>
+        
+        
         
         <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
 
         <ProgressBar Background="{x:Null}" x:Name="TopPageProgressBar"
-            Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top"/>
-
+            Foreground="#FFFFC800" VerticalAlignment="Top"/>
+        
+        <!--<Image Source="/Assets/AlignmentGrid.png" VerticalAlignment="Top" Height="800" Width="480" Margin="0,-32,0,0" Grid.Row="0" IsHitTestVisible="False" />-->
     </Grid>
     
 </phone:PhoneApplicationPage>

@@ -9,11 +9,16 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using MSPToolkit.Encodings;
 using HtmlAgilityPack;
+using Microsoft.Phone.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace SynthemaRu
 {
     public partial class NewsDetail : PhoneApplicationPage
     {
+        private string _mainDetailPath = string.Empty;
+
         public NewsDetail()
         {
             InitializeComponent();
@@ -22,8 +27,8 @@ namespace SynthemaRu
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            string mainDetailPath = NavigationContext.QueryString["mainDetailPath"].ToString();
-            DownloadMainDetail(mainDetailPath);
+            _mainDetailPath = NavigationContext.QueryString["mainDetailPath"].ToString();
+            DownloadMainDetail(_mainDetailPath);
         }
 
         private void DownloadMainDetail(string Path)
@@ -43,6 +48,7 @@ namespace SynthemaRu
             ParseMainDetailHtml(e.Result);
 
             CommentsListBox.ItemsSource = AppData.Comments;
+            SimilarListBox.ItemsSource = AppData.SimilarLinks;
 
             TopPageProgressBar.IsIndeterminate = false;
         }
@@ -55,54 +61,221 @@ namespace SynthemaRu
             //HtmlNode.ElementsFlags.Remove("form");
             doc.LoadHtml(HtmlString);
 
+            #region Information
+
+            var Title = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='tbh']/h1").InnerText;
+            GroupTitleTextBlock.Text = Title.Substring(0, Title.IndexOf("- "));
+            AlbumTitleTextBlock.Text = Title.Remove(0, Title.IndexOf("- ") + 2);
+
+            HtmlNode informationBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[1]/div[3]");
+
+            try 
+            {
+                HtmlNode coverImageBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='newf']/div/div[1]/a");
+                var coverUri = new Uri(Constants.BaseUrl + coverImageBaseNode.SelectSingleNode("img").GetAttributeValue("src", ""), UriKind.Absolute);
+                CoverImage.Source = new BitmapImage(coverUri);
+                BackgroundCoverImage.Visibility = Visibility.Visible;
+            }
+            catch (NullReferenceException)
+            { 
+                CoverImage.Visibility = Visibility.Collapsed;
+            }
+
             try
             {
-                HtmlNodeCollection commentsNodes = doc.DocumentNode.SelectNodes(@".//*[@id='dle-content']/div/div[@class='theblock']");
-
-                foreach (HtmlNode node in commentsNodes)
+                HtmlNodeCollection Details = informationBaseNode.SelectNodes(@"//div/b[
+                                                                                    contains(text(),'Label') or
+                                                                                    contains(text(),'Format') or
+                                                                                    contains(text(),'Style') or
+                                                                                    contains(text(),'Country') or
+                                                                                    contains(text(),'Quality') or
+                                                                                    contains(text(),'Size')
+                                                                                ]/text()");
+                var details = new Dictionary<string, string>();
+                foreach (HtmlNode detailNode in Details)
                 {
-                    var _username = node.SelectSingleNode(@"div[@class='comtext']/b").InnerText;
-                    var _userpic = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='avatar']/img").GetAttributeValue("src", "");
-                    var _text = node.SelectSingleNode(@"div[@class='comtext']/div").InnerText;
-                    var _date = node.SelectSingleNode(@"div[@class='comtext']/text()").InnerText;
+                    var detail = HttpUtility.HtmlDecode(detailNode.InnerHtml);
 
-                    _text = HttpUtility.HtmlDecode(_text);
-                    _date = _date.Replace("&nbsp;", "");
+                    if (detail.Contains("Label"))
+                    {
+                        detail = detail.Remove(0, 7);
+                        details.Add("Лейбл", detail);
+                    }
+                    else if (detail.Contains("Format"))
+                    {
+                        detail = detail.Remove(0, 8);
+                        details.Add("Формат", detail);
+                    }
+                    else if (detail.Contains("Style"))
+                    {
+                        detail = detail.Remove(0, 7);
+                        details.Add("Стиль", detail);
+                    }
+                    else if (detail.Contains("Country"))
+                    {
+                        detail = detail.Remove(0, 9);
+                        details.Add("Страна", detail);
+                    }
+                    else if (detail.Contains("Quality"))
+                    {
+                        detail = detail.Remove(0, 9);
+                        details.Add("Качество", detail);
+                    }
+                    else if (detail.Contains("Size"))
+                    {
+                        detail = detail.Remove(0, 6);
+                        details.Add("Размер", detail);
+                    }
+                }
+                DetailsListBox.ItemsSource = details;
+            }
+            catch (NullReferenceException)
+            {
+                DetailsListBox.Visibility = Visibility.Collapsed;
+            }
+
+            try
+            {
+                HtmlNodeCollection Links = informationBaseNode.SelectNodes("div//b/a");
+
+                var linksList = new Dictionary<string, string>();
+
+                foreach (HtmlNode node in Links)
+                {
+                    linksList.Add(node.GetAttributeValue("href", ""), node.InnerText);
+                }
+
+                LinksListBox.ItemsSource = linksList;
+
+                LinksListBox.Visibility = Visibility.Visible;
+            }
+            catch (NullReferenceException)
+            {
+                LinksListBox.Visibility = Visibility.Collapsed;
+            }
+
+            try
+            {
+                var promotext = (informationBaseNode.SelectSingleNode("div/div[text()][1]")).InnerText;
+                promotext = HttpUtility.HtmlDecode(promotext);
+                promotext = promotext.Replace("<br>", "\n");
+                PromotextTextBlock.Text = promotext;
+            }
+            catch (NullReferenceException)
+            {
+                PromotextTextBlock.Visibility = Visibility.Collapsed;
+            }
+
+            #endregion
+
+            #region Tracklist
+
+            try
+            {
+                //var tracklist = informationBaseNode.SelectSingleNode("div/div[b[contains(text(),'Tracklist')]]").InnerHtml;
+                //tracklist = HttpUtility.HtmlDecode(tracklist);
+                //tracklist = tracklist.Remove(0, tracklist.IndexOf("<br><br>") + 8);
+                //tracklist = tracklist.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
+                //TracklistTextBlock.Text = tracklist;
+
+                HtmlNodeCollection tracklist = informationBaseNode.SelectNodes("div/div[b[contains(text(),'Tracklist')]]/text()");
+                var tracks = new Dictionary<int, string>();
+                var track = string.Empty;
+                var i = 0;
+                foreach (HtmlNode node in tracklist)
+                {
+                    track = node.InnerText;
+                    track = HttpUtility.HtmlDecode(track);
+                    track = track.Remove(0, track.IndexOf(" ") + 1);
+                    tracks.Add(i + 1, track);
+                    i++;
+                }
+                TracklistListBox.ItemsSource = tracks;
+
+                //tracklist = HttpUtility.HtmlDecode(tracklist);
+                //tracklist = tracklist.Remove(0, tracklist.IndexOf("<br><br>") + 8);
+                //tracklist = tracklist.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
+                //TracklistTextBlock.Text = tracklist;
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+
+            #endregion
+
+            #region Comments
+
+            try
+            {
+                HtmlNodeCollection CommentsNodes = doc.DocumentNode.SelectNodes(@".//*[@id='dle-content']/div/div[@class='theblock']");
+
+                foreach (HtmlNode node in CommentsNodes)
+                {
+                    var username = node.SelectSingleNode(@"div[@class='comtext']/b").InnerText;
+                    var userpic = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='avatar']/img").GetAttributeValue("src", "");
+                    var text = node.SelectSingleNode(@"div[@class='comtext']/div").InnerText;
+                    var date = node.SelectSingleNode(@"div[@class='comtext']/text()").InnerText;
+
+                    text = text.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
+                    text = HttpUtility.HtmlDecode(text);
+                    date = date.Replace("&nbsp;", "");
 
                     AppData.Comments.Add(new AppData.Comment
                     {
-                        Username = _username,
-                        Userpic = _userpic,
-                        Text = _text,
-                        Date = _date
+                        Username = username,
+                        Userpic = userpic,
+                        Text = text,
+                        Date = date
                     });
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
-                return;
+                NoCommentsTextBlock.Visibility = Visibility.Visible;
             }
 
-            HtmlNode FullDescriptionBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[1]/div[3]");
+            #endregion
 
-            var _details    = FullDescriptionBaseNode.SelectSingleNode("div/div[2]/b[1]").InnerHtml;
-            var _link       = FullDescriptionBaseNode.SelectSingleNode("div//b/a").GetAttributeValue("href", "");
-            var _link_text  = FullDescriptionBaseNode.SelectSingleNode("div//b/a").InnerText;
-            var _promotext  = FullDescriptionBaseNode.SelectSingleNode("div/div[text()][1]").InnerHtml;
-            var _tracklist  = FullDescriptionBaseNode.SelectSingleNode("div/div[b = 'Tracklist:']").InnerHtml;
+            #region Similar links
 
-            _details    = HttpUtility.HtmlDecode(_details);
-            _promotext  = HttpUtility.HtmlDecode(_promotext);
-            _tracklist  = HttpUtility.HtmlDecode(_tracklist);
+            try
+            {
+                HtmlNode similarLinksBaseNode = doc.DocumentNode.SelectSingleNode(@".//div[@id='dle-content']/div[@class='theblock']");
+                HtmlNodeCollection similarLinks = similarLinksBaseNode.SelectNodes(@"div[@class='stext']/ul/li/a");
 
-            _details    = _details.Replace("<br>", "\n");
-            _promotext  = _promotext.Replace("<br>", "\n");
-            _tracklist  = _tracklist.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
+                foreach (HtmlNode node in similarLinks)
+                {
+                    var title = node.InnerText;
+                    title = HttpUtility.HtmlDecode(title);
+                    AppData.SimilarLinks.Add(new AppData.SimilarLink
+                    {
+                        GroupTitle = title.Substring(0, title.IndexOf("- ")),
+                        AlbumTitle = title.Remove(0, title.IndexOf("- ") + 2),
+                        Url = "/MainDetail.xaml?mainDetailPath=" + node.GetAttributeValue("href", "")
+                    });
+                }
+            }
+            catch (NullReferenceException)
+            {
+                NoSimilarTextBlock.Visibility = Visibility.Visible;
+            }
 
-            DetailsTextBlock.Text =   _details;
-            LinkTextBlock.Text =      _link_text;
-            PromotextTextBlock.Text = _promotext;
-            TracklistTextBlock.Text = _tracklist;
+            #endregion
+
+        }
+
+        private void OpenInBrowser_Click(object sender, EventArgs e)
+        {
+            WebBrowserTask openInBrowser = new WebBrowserTask();
+            openInBrowser.Uri = new Uri(_mainDetailPath, UriKind.Absolute);
+            openInBrowser.Show();
+        }
+
+        protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnBackKeyPress(e);
+            NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.Relative));
         }
     }
 }

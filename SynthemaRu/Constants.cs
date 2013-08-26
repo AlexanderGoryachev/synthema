@@ -10,6 +10,7 @@ namespace SynthemaRu
     {
         public const string BaseUrl = @"http://www.synthema.ru";
         public const string MainItemsStorageFileName = "MainItems.json";
+        public const string NewsItemsStorageFileName = "NewsItems.json";
 
         public const string ReviewsRssPath = @"http://www.synthema.ru/reviews/rss.xml";
     }

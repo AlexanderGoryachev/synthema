@@ -30,8 +30,7 @@ namespace MyAudioPlaybackAgent
         // Current AudioTrack.        
         static AudioTrack currentTrack = null;
 
-        //static AudioTrack streamLQUri = new AudioTrack(new Uri("http://stream.synth-radio.ru:8005/live", UriKind.Absolute),
-        static AudioTrack streamLQUri = new AudioTrack(new Uri("http://cs1-36v4.vk.me/p24/7210ee09d58aaa.mp3", UriKind.Absolute),
+        static AudioTrack streamLQUri = new AudioTrack(new Uri("http://stream.synth-radio.ru:8005/live", UriKind.Absolute),
             "Synth your life", // title
             "Synth Radio (LQ)", // artist
             "Synth Radio stream", // album

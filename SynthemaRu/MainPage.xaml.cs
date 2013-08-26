@@ -22,7 +22,6 @@ namespace SynthemaRu
     public partial class MainPage : PhoneApplicationPage
     {        
         // Constructor
-        
         private List<ReviewsItem> reviewsItems = new List<ReviewsItem>();
         private XElement xmlReviewsOld = null;
         private MediaPlayerLauncher mediaPlayerLauncher = new MediaPlayerLauncher();
@@ -32,14 +31,25 @@ namespace SynthemaRu
         private BitmapImage pauseBmp = new BitmapImage();
         private BitmapImage pausePrsBmp = new BitmapImage();
 
+        private bool IsMainAndNewsDownload = false;
+        private bool IsReviewsDownload = false;
+
+        private double a = 0;
+
         public MainPage()
         {
             InitializeComponent();
 
+            //проверка jsonString
+            //var jsonString = (Application.Current as App).LoadFileFromIsoStorage(Constants.MainItemsStorageFileName);
+
             MainListBox.ItemsSource = AppData.MainItems;
+            NewsListBox.ItemsSource = AppData.NewsItems;
+            NewsListBox2.ItemsSource = AppData.NewsItems;
+            LinksListBox.ItemsSource = AppData.Links;
 
+            // Player
             BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(Instance_PlayStateChanged);
-
             playBmp.UriSource = new Uri(@"Resources/play.png", UriKind.Relative);
             playPrsBmp.UriSource = new Uri(@"Resources/play_prs.png", UriKind.Relative);
             pauseBmp.UriSource = new Uri(@"Resources/pause.png", UriKind.Relative);
@@ -51,7 +61,7 @@ namespace SynthemaRu
         
         #region Main
         
-        void DownloadMain(string Path)
+        void DownloadMainAndNews(string Path)
         {
             WebClient mainClient = new WebClient();
             mainClient.Encoding = new Windows1251Encoding();
@@ -65,19 +75,17 @@ namespace SynthemaRu
             if (e.Error != null)
                 return;
 
+            // Это условие будет выполняться всегда, т.к. на странице находятся динамические рекламные ссылки. ИСПРАВИТЬ
             if (AppData.MainString.Equals(e.Result) == false)
             {
                 AppData.MainString = e.Result;
                 ParseMainHtml(e.Result);
+                MainListBox.ItemsSource = null;
                 MainListBox.ItemsSource = AppData.MainItems;
 
                 ParseNewsHtml(e.Result);
+                NewsListBox.ItemsSource = null;
                 NewsListBox.ItemsSource = AppData.NewsItems;
-            }
-            else
-            {
-                MainListBox.ItemsSource = AppData.MainItems;
-                NewsListBox.ItemsSource = AppData.NewsItems;          
             }
 
             TopPageProgressBar.IsIndeterminate = false;
@@ -96,32 +104,48 @@ namespace SynthemaRu
 
             foreach (HtmlNode node in nodes)
             {
-                var _title = node.SelectSingleNode(@"div[@class='tbh']/h2/a").InnerText;
-                var _link = node.SelectSingleNode(@"div[@class='tbh']/h2/a").GetAttributeValue("href", "http://");
-
-                var _thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]//img").GetAttributeValue("src", "");
-
-                var _imgUrl = "";
-                try { _imgUrl = node.SelectSingleNode(@"div[@class='news']/div/div[1]/a").GetAttributeValue("href", ""); }
+                var title = node.SelectSingleNode(@"div[@class='tbh']/h2/a").InnerText;
+                var link = node.SelectSingleNode(@"div[@class='tbh']/h2/a").GetAttributeValue("href", "http://");
+                var thumbUrl = Constants.BaseUrl + node.SelectSingleNode(@"div[@class='news']/div/div[1]//img").GetAttributeValue("src", "");
+                var description = node.SelectSingleNode(@"div[@class='news']/div/div/text()").InnerText;
+                var pubDate = node.SelectSingleNode(@"div[@class='tbnfo']").InnerText;
+                var imgUrl = string.Empty;
+                try { imgUrl = node.SelectSingleNode(@"div[@class='news']/div/div[1]/a").GetAttributeValue("href", ""); }
                 catch { }
 
-                var _details = node.SelectSingleNode(@"div[@class='news']/div/div[2]").LastChild.InnerHtml.Replace("<br>", "\n");
-                var _description = node.SelectSingleNode(@"div[@class='news']/div").LastChild.InnerText;
-                var _pubDate = node.SelectSingleNode(@"div[@class='tbnfo']").InnerText;
+                HtmlNodeCollection Details = node.SelectNodes(@"div[@class='news']/div/div/b[
+                                                                    contains(text(),'Label') or
+                                                                    contains(text(),'Format') or
+                                                                    contains(text(),'Style') or
+                                                                    contains(text(),'Country') or
+                                                                    contains(text(),'Quality') or
+                                                                    contains(text(),'Size')
+                                                                ]/text()");
 
-                _details = HttpUtility.HtmlDecode(_details);
-                _description = HttpUtility.HtmlDecode(_description);
-                _pubDate = HttpUtility.HtmlDecode(_pubDate);
+                var details = string.Empty;
+                var i = 0;
+                foreach (HtmlNode detailNode in Details)
+                {
+                    var detail = HttpUtility.HtmlDecode(detailNode.InnerHtml);
+                    if (i < 1) details = detail;
+                    else details = details + "\n" + detail;
+                    i++;
+                }
+
+                title = HttpUtility.HtmlDecode(title);
+                description = HttpUtility.HtmlDecode(description);
+
+                pubDate = pubDate.Replace("&nbsp;", ""); 
 
                 AppData.MainItems.Add(new AppData.MainItem
                 {
-                    Title = _title,
-                    Link = _link,
-                    ImgUrl = _imgUrl,
-                    ThumbUrl = _thumbUrl,
-                    Details = _details,
-                    Description = _description,
-                    PubDate = _pubDate
+                    Title = title,
+                    Link = link,
+                    ImgUrl = imgUrl,
+                    ThumbUrl = thumbUrl,
+                    Details = details,
+                    Description = description,
+                    PubDate = pubDate
                 });
             }
         }
@@ -404,45 +428,58 @@ namespace SynthemaRu
 
         #region Page naviation
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {
+            while (NavigationService.BackStack.Any())
+                NavigationService.RemoveBackEntry();
+            base.OnBackKeyPress(e);
         }
-
+        
         private void Pivot_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
             // Main
             if (MainPivot.SelectedIndex == 0)
             {
                 ApplicationBar.IsVisible = true;
-                DownloadMain(Constants.BaseUrl);
-                Adverts.Visibility = Visibility.Collapsed;
+                if (IsMainAndNewsDownload == false)
+                {
+                    DownloadMainAndNews(Constants.BaseUrl);
+                    IsMainAndNewsDownload = true;
+                }
+                SynthemaAdverts.Visibility = Visibility.Collapsed;
             }
             // news
             else if (MainPivot.SelectedIndex == 1)
             {
+                if (IsMainAndNewsDownload == false)
+                {
+                    DownloadMainAndNews(Constants.BaseUrl);
+                    IsReviewsDownload = true;
+                }
                 ApplicationBar.IsVisible = true;
-                Adverts.Visibility = Visibility.Collapsed;
+                SynthemaAdverts.Visibility = Visibility.Collapsed;
             }
             // Reviews
             else if (MainPivot.SelectedIndex == 2)
             {
                 ApplicationBar.IsVisible = true;
-                DownloadReviewsRss(Constants.ReviewsRssPath);
-                Adverts.Visibility = Visibility.Collapsed;
+                if (IsReviewsDownload == false)
+                    DownloadReviewsRss(Constants.ReviewsRssPath);
+                SynthemaAdverts.Visibility = Visibility.Collapsed;
             }
 
             // Search
-            else if (MainPivot.SelectedIndex == 3) 
+            else if (MainPivot.SelectedIndex == 3)
             {
                 ApplicationBar.IsVisible = true;
-                Adverts.Visibility = Visibility.Visible;
+                SynthemaAdverts.Visibility = Visibility.Visible;
             }
 
             // Synth Radio
             else if (MainPivot.SelectedIndex == 4)
-            {
+            {   
                 ApplicationBar.IsVisible = false;
-                Adverts.Visibility = Visibility.Visible;
+                SynthemaAdverts.Visibility = Visibility.Visible;
 
                 if (BackgroundAudioPlayer.Instance.PlayerState == PlayState.Playing)
                     { playButton.Source = pauseBmp; }
@@ -454,14 +491,14 @@ namespace SynthemaRu
             else if (MainPivot.SelectedIndex == 5)
             {
                 ApplicationBar.IsVisible = false;
-                Adverts.Visibility = Visibility.Visible;
+                SynthemaAdverts.Visibility = Visibility.Visible;
             }
 
             // About
             else if (MainPivot.SelectedIndex == 6)
             {
                 ApplicationBar.IsVisible = false;
-                Adverts.Visibility = Visibility.Visible;
+                SynthemaAdverts.Visibility = Visibility.Visible;
             }
         }
 
@@ -493,15 +530,15 @@ namespace SynthemaRu
         {
             if (MainPivot.SelectedIndex == 0) // обновить главную
             {
-                // DownloadMainRss(mainUrl);
+                DownloadMainAndNews(Constants.BaseUrl);
             }
             if (MainPivot.SelectedIndex == 1) // обновить новости
             {
-                // DownloadMainRss(mainUrl);
+                DownloadMainAndNews(Constants.BaseUrl);
             }
             else if (MainPivot.SelectedIndex == 2) // обновить рецензии
             {
-               // DownloadReviewsRss(reviewsRssPath);
+                DownloadMainAndNews(Constants.ReviewsRssPath);
             }
             else if (MainPivot.SelectedIndex == 3) // обновить поиск
             {
@@ -523,6 +560,33 @@ namespace SynthemaRu
 
         #endregion
 
+
+        private void OnPinchCompleted(object sender, PinchGestureEventArgs e)
+        {
+            if (a < (a * e.DistanceRatio))
+            {
+                // pinch
+                NewsListBox.Visibility = Visibility.Collapsed;
+                NewsListBox2.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                // stretch
+                NewsListBox.Visibility = Visibility.Visible;
+                NewsListBox2.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void OnPinchStarted(object sender, PinchStartedGestureEventArgs e)
+        {
+            a = e.Distance;
+        }
+
+        private void OnPinchDelta(object sender, PinchGestureEventArgs e)
+        {
+            a = a * e.DistanceRatio;
+        }
+
         // Sample code for building a localized ApplicationBar
 
         //private void BuildLocalizedApplicationBar()
@@ -539,5 +603,8 @@ namespace SynthemaRu
         //    ApplicationBarMenuItem appBarMenuItem = new ApplicationBarMenuItem(AppResources.AppBarMenuItemText);
         //    ApplicationBar.MenuItems.Add(appBarMenuItem);
         //}
+
+        
+
     }
 }

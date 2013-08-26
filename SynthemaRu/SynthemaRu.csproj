@@ -110,6 +110,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TiltEffect.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -142,6 +143,7 @@
     <Content Include="Assets\AlignmentGrid.png" />
     <Content Include="Assets\AppBar\basecircle.png" />
     <Content Include="Assets\AppBar\feature.calendar.png" />
+    <Content Include="Assets\AppBar\feature.search.png" />
     <Content Include="Assets\AppBar\refresh.png" />
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -166,7 +168,13 @@
     </Content>
     <Content Include="Assets\Tiles\SecTile.jpg" />
     <Content Include="README_FIRST.txt" />
-    <Resource Include="Resources\logo.png" />
+    <Content Include="Resources\bg.png" />
+    <Content Include="Resources\LinksIcons\alldayplus-32.png" />
+    <Content Include="Resources\LinksIcons\lastfm-32.png" />
+    <Content Include="Resources\LinksIcons\oldschoolebm-32.png" />
+    <Content Include="Resources\LinksIcons\synthema-32.png" />
+    <Content Include="Resources\LinksIcons\twitter-32.png" />
+    <Content Include="Resources\logo.png" />
     <Resource Include="Resources\radio_bg.jpg" />
     <Resource Include="Resources\pause.png" />
     <Resource Include="Resources\pause_prs.png" />

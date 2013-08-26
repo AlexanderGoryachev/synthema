@@ -71,11 +71,21 @@ namespace SynthemaRu
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+
+
             var jsonString = LoadFileFromIsoStorage(Constants.MainItemsStorageFileName);
-            //if (jsonString.Equals("[null]") == false)
-            //{
-            //    AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString);
-            //}
+            if (jsonString.Equals("[null]") == false)
+            {
+                try { AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString); }
+                catch { MessageBox.Show("Ошибка загрузки локальных данных (MainItems)"); }
+            }
+
+            jsonString = LoadFileFromIsoStorage("NewsItems.json");
+            if (jsonString.Equals("[null]") == false)
+            {
+                try { AppData.NewsItems = JsonConvert.DeserializeObject<List<AppData.NewsItem>>(jsonString); }
+                catch { MessageBox.Show("Ошибка загрузки локальных данных (NewsItems)"); }
+            }
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -83,18 +93,19 @@ namespace SynthemaRu
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
             // Ensure that application state is restored appropriately
-            //var jsonString = LoadFileFromIsoStorage("MainItems.json");
-            //if (jsonString.Equals("[null]") == false)
-            //{
-            //    AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString);
-            //}
+
+            //var settings = IsolatedStorageSettings.ApplicationSettings;
+            //settings.TryGetValue<List<AppData.MainItem>>("MainItems", out AppData.MainItems);
+            //settings.TryGetValue<List<AppData.NewsItem>>("MainItems", out AppData.NewsItems);
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
         private async void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
-            SerializeAndSaveFileToIsoStorage(AppData.MainItems, Constants.MainItemsStorageFileName);
+            //var settings = IsolatedStorageSettings.ApplicationSettings;
+            //settings.Add("MainItems", AppData.MainItems);
+            //settings.Add("NewsItems", AppData.NewsItems);
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
@@ -103,6 +114,7 @@ namespace SynthemaRu
         {
             // Ensure that required application state is persisted here.
             SerializeAndSaveFileToIsoStorage(AppData.MainItems, Constants.MainItemsStorageFileName);
+            SerializeAndSaveFileToIsoStorage(AppData.NewsItems, Constants.NewsItemsStorageFileName);
         }
 
         private void SerializeAndSaveFileToIsoStorage(object inputFileName, string jsonFileName)
@@ -112,18 +124,21 @@ namespace SynthemaRu
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
-            var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(jsonFileName, FileMode.OpenOrCreate);
-            var fileWriter = new StreamWriter(file).WriteAsync(jsonResult);
+            IsolatedStorageFile myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication();
+            using (StreamWriter fileWriter = new StreamWriter(new IsolatedStorageFileStream(jsonFileName, FileMode.Create, FileAccess.Write, myIsolatedStorage)))
+            {
+                fileWriter.WriteLine(jsonResult);
+                fileWriter.Close();
+            }
         }
 
-        private async Task<string> LoadFileFromIsoStorage(string jsonFileName)
+        public string LoadFileFromIsoStorage(string jsonFileName)
         {
             var jsonString = string.Empty;
             if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(jsonFileName))
             {
                 var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(jsonFileName, FileMode.Open, FileAccess.Read);
-                jsonString = await new StreamReader(file).ReadToEndAsync();
-                //IsolatedStorageFile.GetUserStoreForApplication().DeleteFile(jsonFileName);
+                jsonString = new StreamReader(file).ReadToEnd();
             }
             else jsonString = "[null]";
             return jsonString;
