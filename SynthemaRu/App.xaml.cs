@@ -15,6 +15,9 @@ using Windows.Storage;
 using System.Collections.Generic;
 using MSPToolkit.Encodings;
 using System.Threading.Tasks;
+using SynthemaRu.Common;
+using System.Collections.ObjectModel;
+using Microsoft.Phone.Net.NetworkInformation;
 
 namespace SynthemaRu
 {
@@ -71,21 +74,26 @@ namespace SynthemaRu
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
-
-
             var jsonString = LoadFileFromIsoStorage(Constants.MainItemsStorageFileName);
             if (jsonString.Equals("[null]") == false)
             {
-                try { AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString); }
+                try { AppData.MainItems = JsonConvert.DeserializeObject<ObservableCollection<AppData.MainItem>>(jsonString); }
                 catch { MessageBox.Show("Ошибка загрузки локальных данных (MainItems)"); }
             }
 
             jsonString = LoadFileFromIsoStorage("NewsItems.json");
             if (jsonString.Equals("[null]") == false)
             {
-                try { AppData.NewsItems = JsonConvert.DeserializeObject<List<AppData.NewsItem>>(jsonString); }
+                try { AppData.NewsItems = JsonConvert.DeserializeObject<ObservableCollection<AppData.NewsItem>>(jsonString); }
                 catch { MessageBox.Show("Ошибка загрузки локальных данных (NewsItems)"); }
             }
+
+            if (!DeviceNetworkInformation.IsNetworkAvailable)
+                AppData.IsInternetAccess = false;
+            else
+                AppData.IsInternetAccess = true;
+
+            DownloadingService.DownloadMainAndNews(Constants.BaseUrl);
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -93,6 +101,10 @@ namespace SynthemaRu
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
             // Ensure that application state is restored appropriately
+            if (!DeviceNetworkInformation.IsNetworkAvailable)
+                AppData.IsInternetAccess = false;
+            else
+                AppData.IsInternetAccess = true;
 
             //var settings = IsolatedStorageSettings.ApplicationSettings;
             //settings.TryGetValue<List<AppData.MainItem>>("MainItems", out AppData.MainItems);

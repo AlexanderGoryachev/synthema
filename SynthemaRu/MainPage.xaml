@@ -51,9 +51,6 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <toolkit:GestureService.GestureListener>
-            <toolkit:GestureListener PinchCompleted="OnPinchCompleted" PinchStarted="OnPinchStarted" PinchDelta="OnPinchDelta" />
-        </toolkit:GestureService.GestureListener>
         <Grid.Background>
             <ImageBrush ImageSource="/Resources/bg.png" Stretch="None"/>
         </Grid.Background>
@@ -155,43 +152,43 @@
 
             <phone:PivotItem Header="новости">
                 <Grid>
-                <ListBox x:Name="NewsListBox">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical" 
-                                        Margin="12,0,0,0">
-                                <TextBlock Grid.Row="0"
-                                           TextWrapping="Wrap"
-                                           Text="{Binding Title}"
-                                           FontSize="30"
-                                           Margin="0,0,0,24" 
-                                           FontFamily="Segoe WP Semibold"
-                                           Foreground="#FFFFC800">
-                                </TextBlock>
-                                <StackPanel Orientation="Horizontal" Width="432">
-                                    <Image Grid.Column="0"
-                                           Source="{Binding ThumbUrl}" 
-                                           Width="172" 
-                                           Margin="0,0,12,36" 
-                                           VerticalAlignment="Top" 
-                                           HorizontalAlignment="left" 
-                                           Tap="NewsImage_Tap" 
-                                           Stretch="Uniform" />                                       
-                                    <TextBlock Text="{Binding Description}" 
-                                               Width="246" 
-                                               Height="172"
-                                               FontSize="24"
-                                               FontFamily="Segoe WP Light"
-                                               TextWrapping="Wrap" 
-                                               Foreground="#FFFFFFFF"
-                                               Margin="0,-9,0,24"
-                                               TextTrimming="WordEllipsis"
-                                               VerticalAlignment="Top"/>
+                    <ListBox x:Name="NewsListBox" >
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" 
+                                            Margin="12,0,0,0">
+                                    <TextBlock Grid.Row="0"
+                                               TextWrapping="Wrap"
+                                               Text="{Binding Title}"
+                                               FontSize="30"
+                                               Margin="0,0,0,24" 
+                                               FontFamily="Segoe WP Semibold"
+                                               Foreground="#FFFFC800">
+                                    </TextBlock>
+                                    <StackPanel Orientation="Horizontal" Width="432">
+                                        <Image Grid.Column="0"
+                                               Source="{Binding ThumbUrl}" 
+                                               Width="172" 
+                                               Margin="0,0,12,36" 
+                                               VerticalAlignment="Top" 
+                                               HorizontalAlignment="left" 
+                                               Tap="NewsImage_Tap" 
+                                               Stretch="Uniform" />                                       
+                                        <TextBlock Text="{Binding Description}" 
+                                                   Width="246" 
+                                                   Height="172"
+                                                   FontSize="24"
+                                                   FontFamily="Segoe WP Light"
+                                                   TextWrapping="Wrap" 
+                                                   Foreground="#FFFFFFFF"
+                                                   Margin="0,-9,0,24"
+                                                   TextTrimming="WordEllipsis"
+                                                   VerticalAlignment="Top"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>                        
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                            </DataTemplate>                        
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 
                 <ListBox x:Name="NewsListBox2" Visibility="Collapsed">
                     <ListBox.ItemTemplate>
@@ -238,7 +235,7 @@
                                         <ColumnDefinition Width="200"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Image Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="reviewsImage_Tap" />
+                                    <Image Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" />
 
                                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                                         <TextBlock TextWrapping="Wrap" Foreground="#FFAAAAAA" FontFamily="Portable User Interface" FontStretch="Condensed">
@@ -355,8 +352,11 @@
 
         <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
 
-        <ProgressBar Background="{x:Null}" x:Name="TopPageProgressBar"
-            Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top"/>
+        <ProgressBar Background="{x:Null}" 
+                     x:Name="TopPageProgressBar"
+                     Foreground="{StaticResource PhoneAccentBrush}" 
+                     VerticalAlignment="Top"
+                     IsIndeterminate="{Binding Source=AppData.ProgressBarState}" />
 
         <UI:AdControl x:Name="SynthemaAdverts" ApplicationId="test_client" AdUnitId="Image480_80" Height="80" Width="480" VerticalAlignment="Bottom"/>
 

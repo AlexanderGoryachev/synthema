@@ -19,6 +19,9 @@ namespace SynthemaRu
         public ImagePage()
         {
             InitializeComponent();
+
+            if (!AppData.IsInternetAccess)
+                MessageBox.Show("Подключение к Интернету отсутствует. Для работы приложения необходим доступ к сети");
         }
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {

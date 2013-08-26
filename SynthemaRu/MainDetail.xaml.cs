@@ -22,6 +22,9 @@ namespace SynthemaRu
         public NewsDetail()
         {
             InitializeComponent();
+
+            if (!AppData.IsInternetAccess)
+                MessageBox.Show("Подключение к Интернету отсутствует. Для работы приложения необходим доступ к сети");
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

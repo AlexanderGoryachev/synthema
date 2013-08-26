@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +12,11 @@ namespace SynthemaRu
     {
         #region Main
 
+        public static bool IsInternetAccess = true;
+
         public static string MainString = string.Empty;
 
-        public static List<MainItem> MainItems = new List<MainItem>();
+        public static ObservableCollection<MainItem> MainItems {get; set;}
 
         public class MainItem
         {
@@ -31,7 +34,7 @@ namespace SynthemaRu
 
         #region News
 
-        public static List<NewsItem> NewsItems = new List<NewsItem>();
+        public static ObservableCollection<NewsItem> NewsItems { get; set; }
 
         public class NewsItem
         {
@@ -47,7 +50,7 @@ namespace SynthemaRu
 
         #region MainDetail
 
-        public static List<Comment> Comments = new List<Comment>();
+        public static ObservableCollection<Comment> Comments = new ObservableCollection<Comment>();
 
         public class Comment
         {
