@@ -8,9 +8,9 @@
     xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:UI="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI"
+    xmlns:local="clr-namespace:ControlTiltEffect"
+    local:TiltEffect.IsTiltEnabled="True"
     x:Class="SynthemaRu.MainPage"
-    mc:Ignorable="d"
-    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
@@ -44,14 +44,19 @@
                 <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
                 <shell:ApplicationBarMenuItem Text="MenuItem 2"/>
             </shell:ApplicationBar.MenuItems>
-            <shell:ApplicationBarIconButton IconUri="/Assets/AppBar/feature.calendar.png" Text="кратко"/>
+            <shell:ApplicationBarIconButton x:Name="ListAppButton" IconUri="/Toolkit.Content/ApplicationBar.Select.png" Text="список" IsEnabled="False"/>
             <shell:ApplicationBarIconButton x:Name="RefreshAppButton" IconUri="/Assets/AppBar/refresh.png" Text="Обновить" IsEnabled="True" Click="RefreshAppButton_Click_1"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot">
-
+        <toolkit:GestureService.GestureListener>
+            <toolkit:GestureListener PinchCompleted="OnPinchCompleted" PinchStarted="OnPinchStarted" PinchDelta="OnPinchDelta" />
+        </toolkit:GestureService.GestureListener>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Resources/bg.png" Stretch="None"/>
+        </Grid.Background>
         <!-- LOCALIZATION NOTE:
             To localize the displayed strings copy their values to appropriately named
             keys in the app's neutral language resource file (AppResources.resx) then
@@ -72,75 +77,150 @@
          -->
 
         <!--Pivot Control-->
-        <phone:Pivot x:Name="MainPivot" Title=" " SelectionChanged="Pivot_SelectionChanged_1" Foreground="White" Background="Black">
+        <phone:Pivot x:Name="MainPivot" Title=" " SelectionChanged="Pivot_SelectionChanged_1" Foreground="White">
             <!--Pivot item one-->
-            <phone:PivotItem Header="новости">
+            <phone:PivotItem Header="главная">
                 <!--Double line list with text wrapping-->
-                <ListBox x:Name="news_ListBox" Tap="news_ListBox_Tap" Margin="15,0,0,0" SelectionChanged="news_ListBox_SelectionChanged" ManipulationCompleted="news_ListBox_ManipulationCompleted" ManipulationDelta="news_ListBox_ManipulationDelta">
+                <ListBox x:Name="MainListBox" 
+                         Margin="12,0,0,0" 
+                         VerticalContentAlignment="Top" 
+                         HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" FontFamily="Segoe WP Semibold" Padding="0,0,0,20" >
-                                    <TextBlock.Foreground>
-                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                            <GradientStop Color="#FFFFF300" Offset="0"/>
-                                            <GradientStop Color="#FFE69D00" Offset="1"/>
-                                            <GradientStop Color="#FFEAB500" Offset="0.713"/>
-                                        </LinearGradientBrush>
-                                    </TextBlock.Foreground>
+                            <StackPanel x:Name="MainStackPanel" 
+                                        Margin="0,0,12,0"
+                                        Tap="MainStackPanel_Tap" >
+                                <TextBlock Grid.Row="0" 
+                                           TextWrapping="Wrap" 
+                                           Text="{Binding Title}" 
+                                           FontSize="30" 
+                                           Margin="0,0,0,24" 
+                                           VerticalAlignment="Center" 
+                                           Foreground="#FFFFC800" 
+                                           FontFamily="Segoe WP Semibold" >
                                 </TextBlock>
 
-                                <!--TextBlock TextWrapping="Wrap" Text="{Binding PubDate}" /-->
+                                <Grid Grid.Row="1" 
+                                      VerticalAlignment="Top" 
+                                      Margin="0,0,0,24" >
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
 
-                                <Grid VerticalAlignment="Top" Margin="0,0,0,50" >
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Image Grid.Column="0" delay:LowProfileImageLoader.UriSource="{Binding ThumbUrl}" Margin="0,10,20,20" VerticalAlignment="Top" HorizontalAlignment="Left" Tap="newsImage_Tap" />
-
-                                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Label:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Label}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Format:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Format}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Country:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Country}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Style:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Style}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Quality:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Quality}" />
-                                        </TextBlock>
-                                        <TextBlock TextWrapping="Wrap" Foreground="White">
-                                                    <Run Text="Size:" FontWeight="Bold" />
-                                                    <Run Text="{Binding Size}" />
-                                        </TextBlock>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Background="Black"
+                                                    Margin="0,0,12,0"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Top"
+                                                    MinHeight="172" >
+                                            <Image Source="{Binding ThumbUrl}" 
+                                               Width="172"
+                                               Grid.Column="0"   
+                                               HorizontalAlignment="Left" 
+                                               VerticalAlignment="Center"
+                                               Tap="MainImage_Tap" />
+                                        </StackPanel>
+                                        <TextBlock Width="246"
+                                                   Text="{Binding Details}"
+                                                   FontFamily="Segoe WP Light"
+                                                   TextWrapping="Wrap" 
+                                                   Foreground="#FFCCCCCC" 
+                                                   Margin="0,-8,0,0"/>
                                     </StackPanel>
+
+                                    <TextBlock Text="{Binding Description}" 
+                                               FontSize="24" 
+                                               Grid.Row="2" 
+                                               Grid.ColumnSpan="2" 
+                                               FontFamily="Segoe WP Light"
+                                               TextWrapping="Wrap" 
+                                               Foreground="#FFFFFFFF" />
                                 </Grid>
+                                
+                                <TextBlock Text="{Binding PubDate}" 
+                                           Grid.Row="2" TextWrapping="Wrap" 
+                                           FontSize="18" 
+                                           Foreground="#FFCCCCCC"
+                                           Margin="0,0,0,36"
+                                           FontFamily="Segoe WP Light"/>
+                                
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="новости">
+                <Grid>
+                <ListBox x:Name="NewsListBox">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" 
+                                        Margin="12,0,0,0">
+                                <TextBlock Grid.Row="0"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding Title}"
+                                           FontSize="30"
+                                           Margin="0,0,0,24" 
+                                           FontFamily="Segoe WP Semibold"
+                                           Foreground="#FFFFC800">
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal" Width="432">
+                                    <Image Grid.Column="0"
+                                           Source="{Binding ThumbUrl}" 
+                                           Width="172" 
+                                           Margin="0,0,12,36" 
+                                           VerticalAlignment="Top" 
+                                           HorizontalAlignment="left" 
+                                           Tap="NewsImage_Tap" 
+                                           Stretch="Uniform" />                                       
+                                    <TextBlock Text="{Binding Description}" 
+                                               Width="246" 
+                                               Height="172"
+                                               FontSize="24"
+                                               FontFamily="Segoe WP Light"
+                                               TextWrapping="Wrap" 
+                                               Foreground="#FFFFFFFF"
+                                               Margin="0,-9,0,24"
+                                               TextTrimming="WordEllipsis"
+                                               VerticalAlignment="Top"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>                        
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+                <ListBox x:Name="NewsListBox2" Visibility="Collapsed">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" 
+                                        Margin="12,0,0,0">
+                                <TextBlock Grid.Row="0"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding Title}"
+                                           FontSize="30"
+                                           Margin="0,0,0,24" 
+                                           FontFamily="Segoe WP Semibold"
+                                           Foreground="#FFFFC800">
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </phone:PivotItem>
 
             <!--Pivot item two-->
             <phone:PivotItem Header="рецензии">
                 <!--Double line list no text wrapping-->
-                <ListBox  x:Name="reviews_ListBox" Tap="news_ListBox_Tap" Margin="15,0,0,0" SelectionChanged="news_ListBox_SelectionChanged" >
+                <ListBox  x:Name="reviews_ListBox" Tap="MainListBox_Tap" Margin="15,0,0,0" >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Title}" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Padding="0,0,0,20" >
+                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontSize="32" Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="Bold" Padding="0,0,0,20" >
                                     <TextBlock.Foreground>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                             <GradientStop Color="#FFFFF300" Offset="0"/>
@@ -195,7 +275,7 @@
 
             <!--Pivot item two-->
             <phone:PivotItem Header="поиск" Margin="12,28,12,80">
-                <TextBox x:Name="SearchBox" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" Text="Что ищем?" VerticalAlignment="Top" Width="456" GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus" Foreground="Black" Background="#BFFFFFFF" SelectionForeground="White" CaretBrush="Black" BorderBrush="#BF000000"/>
+                    <TextBox x:Name="SearchBox" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" Text="Что ищем?" VerticalAlignment="Top" Width="456" GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus" Foreground="Black" Background="#BFFFFFFF" SelectionForeground="White" CaretBrush="Black" BorderBrush="#BF000000"/>
             </phone:PivotItem>
 
             <!--Pivot item two-->
@@ -217,7 +297,7 @@
 
                     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0">
                         <TextBlock Text="96k" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
-                        <toolkit:ToggleSwitch Content="" HorizontalAlignment="Center" Background="#FFFFF300" Checked="ToggleSwitch_Checked_1" Unchecked="ToggleSwitch_Unchecked_1" FontSize="32" />
+                        <toolkit:ToggleSwitch Content="" HorizontalAlignment="Center" Background="#FFFFF300" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked" FontSize="32" />
                         <TextBlock Text="128k" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" Foreground="#FFAAAAAA" />
                     </StackPanel>
 
@@ -227,51 +307,58 @@
                         <Image Source="Resources/sr4.jpg" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="0,0,0,10" HorizontalAlignment="Center">
                             <TextBlock x:Name="Disclaimer" Text="Аудиопоток предоставлен сайтом" VerticalAlignment="Top" Foreground="Black" />
-                            <HyperlinkButton Content="synth-radio.ru" FontSize="20" VerticalAlignment="Top" Foreground="#FF002980" FontWeight="Bold" Click="HyperlinkButton_Click_1" />
+                            <HyperlinkButton Content="synth-radio.ru" FontSize="20" VerticalAlignment="Top" Foreground="#FF002980" FontWeight="Bold" Click="HyperlinkButton_Click" />
                         </StackPanel>
                     </Grid>
 
                 </Grid>
             </phone:PivotItem>
 
-            <!--Pivot item three-->
+            <!--Pivot item -->
             <phone:PivotItem Header="ссылки" Margin="12,28,12,80">
-                <!-- //////////////////////////////////////// -->
-                <ListBox x:Name="Links" Tap="Links_Tap">
-                    <HyperlinkButton x:Name="synthema" NavigateUri="http://synthema.ru/" Content="Synthema.ru" FontSize="40" TargetName="_blank" UseLayoutRounding="True" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="twitter" NavigateUri="http://twitter.com/synthema_ru/" Content="Twitter" FontSize="40" TargetName="_blank" UseLayoutRounding="True" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="lastfm" NavigateUri="http://www.lastfm.ru/group/synthema.ru" Content="Last.fm" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="DAC" NavigateUri="http://www.deutsche-alternative-charts.de/" Content="DAC" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="EAC" NavigateUri="http://www.alt-charts.eu/" Content="EAC" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="GEWS" NavigateUri="http://www.gewc.de/reviews,0,2,1.html" Content="GEWS" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="ChildOfNight" NavigateUri="http://deti-nochi.kiev.ua/" Content="Дети Ночи" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="OldSchoolEBM" NavigateUri="http://www.oldschoolebm.ru/" Content="OldSchoolEBM.ru" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="DarkBelarus" NavigateUri="http://dark.by/" Content="DarkBelarus" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="Alldayplus" NavigateUri="http://alldayplus.ru/" Content="Alldayplus.ru" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
-                    <HyperlinkButton x:Name="Zillo" NavigateUri="http://zillo.de/" Content="Zillo" FontSize="40" TargetName="_blank" Foreground="#FFAAAAAA"/>
+                <ListBox x:Name="LinksListBox" Margin="15,0,0,0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" >
+                                <StackPanel Height="32" 
+                                            Width="32" 
+                                            Background="{Binding IconBackgroundColor}" 
+                                            Margin="0,5,0,5" >
+                                    <Image Source="{Binding IconSource}" />
+                                    <TextBlock FontSize="14" 
+                                               Text="{Binding IconText}" 
+                                               Foreground="White"
+                                               Margin="0,7,0,0" 
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                                <HyperlinkButton Content="{Binding DisplayText}" 
+                                                 NavigateUri="{Binding LinkUrl}" 
+                                                 VerticalAlignment="Center"
+                                                 FontFamily="Segoe WP Light"
+                                                 FontSize="24" 
+                                                 TargetName="_blank"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
             </phone:PivotItem>
 
             <!--Pivot item three-->
             <phone:PivotItem Header="о программе" Margin="12,28,12,80">
                 <StackPanel Orientation="Vertical" Margin="10,0">
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" TextWrapping="Wrap" Foreground="#FFAAAAAA">
+                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="24" TextWrapping="Wrap">
                     	<Run Text="Неофициальный клиент для сайта Synthema.ru"/>
                     </TextBlock>
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" TextWrapping="Wrap" Foreground="#FFAAAAAA">
-                    	<Run Text="В программе используется потоковое аудио с сайта synth-radio.ru"/>
-                    </TextBlock>
-                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="32" TextWrapping="Wrap" Foreground="#FFAAAAAA">
-                    	<Run Text="Автор: Горячев Александр"/>
-                    </TextBlock>
-                </StackPanel>   
+                </StackPanel>
             </phone:PivotItem>
         </phone:Pivot>
+
         <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
+
         <ProgressBar Background="{x:Null}" x:Name="TopPageProgressBar"
             Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top"/>
-        
-        <UI:AdControl x:Name="Adverts" ApplicationId="test_client" AdUnitId="Image480_80" Height="80" Width="480" VerticalAlignment="Bottom"/>
+
+        <UI:AdControl x:Name="SynthemaAdverts" ApplicationId="test_client" AdUnitId="Image480_80" Height="80" Width="480" VerticalAlignment="Bottom"/>
 
         <!--Uncomment to see an alignment grid to help ensure your controls are
             aligned on common boundaries.  The image has a top margin of -32px to

@@ -7,8 +7,14 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using SynthemaRu.Resources;
-using SynthemaRu.ViewModels;
 using Microsoft.Phone.BackgroundAudio;
+using System.IO.IsolatedStorage;
+using System.IO;
+using Newtonsoft.Json;
+using Windows.Storage;
+using System.Collections.Generic;
+using MSPToolkit.Encodings;
+using System.Threading.Tasks;
 
 namespace SynthemaRu
 {
@@ -16,25 +22,7 @@ namespace SynthemaRu
     {
 
         public static AudioTrack currentTrack = null;
-
-        private static MainViewModel viewModel = null;
-
-        /// <summary>
-        /// A static ViewModel used by the views to bind against.
-        /// </summary>
-        /// <returns>The MainViewModel object.</returns>
-        public static MainViewModel ViewModel
-        {
-            get
-            {
-                // Delay creation of the view model until necessary
-                if (viewModel == null)
-                    viewModel = new MainViewModel();
-
-                return viewModel;
-            }
-        }
-
+        
         /// <summary>
         /// Provides easy access to the root frame of the Phone Application.
         /// </summary>
@@ -83,6 +71,21 @@ namespace SynthemaRu
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+
+
+            var jsonString = LoadFileFromIsoStorage(Constants.MainItemsStorageFileName);
+            if (jsonString.Equals("[null]") == false)
+            {
+                try { AppData.MainItems = JsonConvert.DeserializeObject<List<AppData.MainItem>>(jsonString); }
+                catch { MessageBox.Show("Ошибка загрузки локальных данных (MainItems)"); }
+            }
+
+            jsonString = LoadFileFromIsoStorage("NewsItems.json");
+            if (jsonString.Equals("[null]") == false)
+            {
+                try { AppData.NewsItems = JsonConvert.DeserializeObject<List<AppData.NewsItem>>(jsonString); }
+                catch { MessageBox.Show("Ошибка загрузки локальных данных (NewsItems)"); }
+            }
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -90,16 +93,19 @@ namespace SynthemaRu
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
             // Ensure that application state is restored appropriately
-            if (!App.ViewModel.IsDataLoaded)
-            {
-                App.ViewModel.LoadData();
-            }
+
+            //var settings = IsolatedStorageSettings.ApplicationSettings;
+            //settings.TryGetValue<List<AppData.MainItem>>("MainItems", out AppData.MainItems);
+            //settings.TryGetValue<List<AppData.NewsItem>>("MainItems", out AppData.NewsItems);
         }
 
         // Code to execute when the application is deactivated (sent to background)
         // This code will not execute when the application is closing
-        private void Application_Deactivated(object sender, DeactivatedEventArgs e)
+        private async void Application_Deactivated(object sender, DeactivatedEventArgs e)
         {
+            //var settings = IsolatedStorageSettings.ApplicationSettings;
+            //settings.Add("MainItems", AppData.MainItems);
+            //settings.Add("NewsItems", AppData.NewsItems);
         }
 
         // Code to execute when the application is closing (eg, user hit Back)
@@ -107,6 +113,35 @@ namespace SynthemaRu
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
             // Ensure that required application state is persisted here.
+            SerializeAndSaveFileToIsoStorage(AppData.MainItems, Constants.MainItemsStorageFileName);
+            SerializeAndSaveFileToIsoStorage(AppData.NewsItems, Constants.NewsItemsStorageFileName);
+        }
+
+        private void SerializeAndSaveFileToIsoStorage(object inputFileName, string jsonFileName)
+        {
+            string jsonResult = JsonConvert.SerializeObject(inputFileName, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+
+            IsolatedStorageFile myIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication();
+            using (StreamWriter fileWriter = new StreamWriter(new IsolatedStorageFileStream(jsonFileName, FileMode.Create, FileAccess.Write, myIsolatedStorage)))
+            {
+                fileWriter.WriteLine(jsonResult);
+                fileWriter.Close();
+            }
+        }
+
+        public string LoadFileFromIsoStorage(string jsonFileName)
+        {
+            var jsonString = string.Empty;
+            if (IsolatedStorageFile.GetUserStoreForApplication().FileExists(jsonFileName))
+            {
+                var file = IsolatedStorageFile.GetUserStoreForApplication().OpenFile(jsonFileName, FileMode.Open, FileAccess.Read);
+                jsonString = new StreamReader(file).ReadToEnd();
+            }
+            else jsonString = "[null]";
+            return jsonString;
         }
 
         // Code to execute if a navigation fails

@@ -5,7 +5,7 @@
     <Language code="ru" />
     <Language code="ru-RU" />
   </Languages>
-  <App xmlns="" ProductID="{4d6e04f6-5d61-46e6-9684-4f11afb8b43a}" Title="Synthema RSS" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Alexander Goryachev" Description="Sample description" Publisher="Alexander Goryachev" PublisherID="{04cb9875-4cc9-4419-a307-c18ec13b32c2}">
+  <App xmlns="" ProductID="{4d6e04f6-5d61-46e6-9684-4f11afb8b43a}" Title="Synthema RSS" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Alexander Goryachev" Description="Неофициальный клиент портала synthema.ru" Publisher="Alexander Goryachev" PublisherID="{04cb9875-4cc9-4419-a307-c18ec13b32c2}">
     <IconPath IsRelative="true" IsResource="false">Assets\Tiles\FlipCycleTileSmall.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

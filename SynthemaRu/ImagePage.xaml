@@ -38,7 +38,7 @@
 
 
     <Grid x:Name="LayoutRoot" >
-        <Image x:Name="BigImage" HorizontalAlignment="Center" VerticalAlignment="Center" />        
+        <Image x:Name="BigImage" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
     <!--LayoutRoot представляет корневую сетку, где размещается все содержимое страницы-->
 
