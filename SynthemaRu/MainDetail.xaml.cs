@@ -223,6 +223,7 @@ namespace SynthemaRu
                     text = text.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
                     text = HttpUtility.HtmlDecode(text);
                     date = date.Replace("&nbsp;", "");
+                    date = date.Trim();
 
                     AppData.Comments.Add(new AppData.Comment
                     {

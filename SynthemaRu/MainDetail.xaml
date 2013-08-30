@@ -310,38 +310,47 @@
                     <ListBox x:Name="CommentsListBox" Margin="12,0,0,0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal"
-                                            Margin="0,0,0,36">
-                                    <Image Source="{Binding Userpic}" 
-                                           Height="99" 
-                                           Width="99" 
-                                           Stretch="Fill" 
-                                           VerticalAlignment="Top" 
-                                           HorizontalAlignment="Left" />
-                                    <StackPanel Orientation="Vertical" 
-                                                HorizontalAlignment="Left"
-                                                Margin="12,0,0,0">
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Left"
-                                                    Width="321"                                             
-                                                    Margin="0,-8,0,0">
-                                            <TextBlock Width="321" 
-                                                       TextWrapping="Wrap"
-                                                       VerticalAlignment="Top"
-                                                       FontSize="24" 
-                                                       Margin="0,0,0,12">
-                                                <Run Text="{Binding Username}" Foreground="#FFFFC800" FontSize="24" />
-                                                <Run Text="{Binding Date}" Foreground="#FFCCCCCC" FontSize="24" FontFamily="Segoe WP Light" />
+                                <StackPanel Orientation="Vertical"
+                                            Margin="0,24,0,0">
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="0,0,0,24">
+                                        <Image Source="{Binding Userpic}"
+                                       Height="74" 
+                                       Width="74" 
+                                       Stretch="Fill" 
+                                       VerticalAlignment="Top" 
+                                       HorizontalAlignment="Left" />
+                                        <StackPanel Orientation="Vertical" 
+                                            HorizontalAlignment="Left"
+                                            Margin="12,0,0,0">
+                                            <TextBlock Width="346"
+                                               Text="{Binding Username}"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Top"
+                                               FontSize="36" 
+                                               Margin="0,-10,0,12" 
+                                               Foreground="#FFFFC800" 
+                                               FontFamily="Segoe WP Light" >
+                                            </TextBlock>
+                                            <TextBlock Width="346" 
+                                               Text="{Binding Date}"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Top"
+                                               FontSize="24" 
+                                               Margin="0,-10,0,12"
+                                               Foreground="#FFFFFFFF"
+                                               FontFamily="Segoe WP Light">
                                             </TextBlock>
                                         </StackPanel>
-                                        <TextBlock Text="{Binding Text}"
-                                                   VerticalAlignment="Top"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="White"
-                                                   Margin="0,-8,0,0"
-                                                   Width="321"
-                                                   FontSize="24" />
                                     </StackPanel>
+                                    <TextBlock Text="{Binding Text}"
+                                       VerticalAlignment="Top"
+                                       FontFamily="Segoe WP Light"
+                                       TextWrapping="Wrap"
+                                       Foreground="White"
+                                       Margin="0,-10,0,24"
+                                       Width="432"
+                                       FontSize="24" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

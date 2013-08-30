@@ -352,11 +352,11 @@
 
         <Image HorizontalAlignment="Left" Height="35" Margin="19,16,0,0" VerticalAlignment="Top" Width="225" Source="/Resources/logo.png"/>
 
-        <ProgressBar Background="{x:Null}" 
-                     x:Name="TopPageProgressBar"
-                     Foreground="{StaticResource PhoneAccentBrush}" 
+        <ProgressBar x:Name="LoadingBar"
+                     Background="{x:Null}"                     
+                     Foreground="#FFFFC800" 
                      VerticalAlignment="Top"
-                     IsIndeterminate="{Binding Source=AppData.ProgressBarState}" />
+                     IsIndeterminate="True" />
 
         <UI:AdControl x:Name="SynthemaAdverts" ApplicationId="test_client" AdUnitId="Image480_80" Height="80" Width="480" VerticalAlignment="Bottom"/>
 
