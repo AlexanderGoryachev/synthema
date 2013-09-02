@@ -12,12 +12,15 @@ using HtmlAgilityPack;
 using Microsoft.Phone.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Diagnostics;
+using SynthemaRu.Common;
 
 namespace SynthemaRu
 {
     public partial class NewsDetail : PhoneApplicationPage
     {
         private string _mainDetailPath = string.Empty;
+        private HtmlNode coverImageBaseNode;
 
         public NewsDetail()
         {
@@ -74,7 +77,7 @@ namespace SynthemaRu
 
             try 
             {
-                HtmlNode coverImageBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='newf']/div/div[1]/a");
+                coverImageBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='newf']/div/div[1]/a");
                 var coverUri = new Uri(Constants.BaseUrl + coverImageBaseNode.SelectSingleNode("img").GetAttributeValue("src", ""), UriKind.Absolute);
                 CoverImage.Source = new BitmapImage(coverUri);
                 BackgroundCoverImage.Visibility = Visibility.Visible;
@@ -209,6 +212,8 @@ namespace SynthemaRu
 
             #region Comments
 
+            Stopwatch commentsWatch = new Stopwatch();
+            commentsWatch.Start();
             try
             {
                 HtmlNodeCollection CommentsNodes = doc.DocumentNode.SelectNodes(@".//*[@id='dle-content']/div/div[@class='theblock']");
@@ -222,6 +227,11 @@ namespace SynthemaRu
 
                     text = text.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
                     text = HttpUtility.HtmlDecode(text);
+
+                    text = StringHelper.FormatSmiles(text, AppData.Smiles);
+
+                    var CommT = StringHelper.FormatQuotes(text);
+                    
                     date = date.Replace("&nbsp;", "");
                     date = date.Trim();
 
@@ -239,6 +249,8 @@ namespace SynthemaRu
                 NoCommentsTextBlock.Visibility = Visibility.Visible;
             }
 
+            commentsWatch.Stop();
+            var commentsParasingTime = commentsWatch.Elapsed.Milliseconds.ToString();
             #endregion
 
             #region Similar links
@@ -280,6 +292,15 @@ namespace SynthemaRu
         {
             base.OnBackKeyPress(e);
             NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.Relative));
+        }
+
+        private void CoverImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {            
+            if (coverImageBaseNode != null)
+            {
+                var imgUrl = coverImageBaseNode.GetAttributeValue("href", string.Empty);
+                if (imgUrl != string.Empty) NavigationService.Navigate(new Uri("/ImagePage.xaml?imgUrl=" + imgUrl, UriKind.Relative));
+            }
         }
     }
 }

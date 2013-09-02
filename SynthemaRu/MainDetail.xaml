@@ -13,7 +13,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}" 
-    SupportedOrientations="Portrait"  Orientation="Portrait">
+    SupportedOrientations="Portrait" Orientation="Portrait">
 
     <phone:PhoneApplicationPage.Resources>
         <Style x:Key="HyperlinkButtonWrappingStyle"
@@ -203,7 +203,9 @@
                                         Visibility="Collapsed">                                
                                 <Image x:Name="CoverImage"                                    
                                        Width="210"
-                                       VerticalAlignment="Center" />
+                                       VerticalAlignment="Center"
+                                       Tap="CoverImage_Tap"
+                                       local:TiltEffect.IsTiltEnabled="True" />
                             </StackPanel>
                             <ListBox x:Name="LinksListBox"
                                      ScrollViewer.VerticalScrollBarVisibility="Disabled"

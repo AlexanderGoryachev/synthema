@@ -14,7 +14,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False" Background="Black">
+    shell:SystemTray.IsVisible="False" Background="Black" >
 
     <toolkit:TransitionService.NavigationInTransition>
         <toolkit:NavigationInTransition>

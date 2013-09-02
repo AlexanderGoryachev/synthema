@@ -34,7 +34,8 @@
                 <toolkit:SlideTransition Mode="SlideDownFadeOut"/>
             </toolkit:NavigationOutTransition.Forward>
         </toolkit:NavigationOutTransition>
-    </toolkit:TransitionService.NavigationOutTransition>
+    </toolkit:TransitionService.NavigationOutTransition> 
+    
 
 
     <Grid x:Name="LayoutRoot" >

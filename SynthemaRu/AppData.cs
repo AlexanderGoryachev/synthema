@@ -10,6 +10,19 @@ namespace SynthemaRu
 {
     class AppData
     {
+        #region Smiles
+
+        public static Dictionary<string, string> Smiles = new Dictionary<string, string>()
+        {
+            { "smile", ":-)" },
+            { "wink", ";-)" },
+            { "biggrin", ":-D" },
+            { "belay", ":-O" },
+            { "laughing", ":-D" }
+        };
+
+        #endregion
+
         #region Main
 
         public static bool IsInternetAccess = true;
