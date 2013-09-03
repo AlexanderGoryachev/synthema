@@ -36,19 +36,25 @@ namespace SynthemaRu
         {
             InitializeComponent();
 
-            MainListBox.ItemsSource = AppData.MainItems;
-            NewsListBox.ItemsSource = AppData.NewsItems;
             DownloadingService.webClient.DownloadStringCompleted += new DownloadStringCompletedEventHandler(MainStringDownloadCompleted);
 
-            if (!AppData.IsInternetAccess)
-                MessageBox.Show("Подключение к Интернету отсутствует. Для работы приложения необходим доступ к сети");
-
-            // Player
             BackgroundAudioPlayer.Instance.PlayStateChanged += new EventHandler(Instance_PlayStateChanged);
             playBmp.UriSource = new Uri(@"Resources/play.png", UriKind.Relative);
             playPrsBmp.UriSource = new Uri(@"Resources/play_prs.png", UriKind.Relative);
             pauseBmp.UriSource = new Uri(@"Resources/pause.png", UriKind.Relative);
             pausePrsBmp.UriSource = new Uri(@"Resources/pause_prs.png", UriKind.Relative);
+
+            MainListBox.ItemsSource = AppData.MainItems;
+            NewsListBox.ItemsSource = AppData.NewsItems;
+
+            if (!AppData.IsInternetAccess)
+                MessageBox.Show("Подключение к Интернету отсутствует. Для работы приложения необходим доступ к сети");
+
+            if (AppData.IsMainDownloaded)
+                LoadingBar.IsIndeterminate = false;
+            else
+                LoadingBar.IsIndeterminate = true;
+
 
             //Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();
@@ -66,6 +72,8 @@ namespace SynthemaRu
             // Функции парсинга выполняются 5,5 секунд. Необходимо оптимизировать.
             ParsingService.ParseMainHtml(e.Result);
             ParsingService.ParseNewsHtml(e.Result);
+
+            AppData.IsMainDownloaded = true;
             LoadingBar.IsIndeterminate = false;
         }
 
@@ -159,14 +167,14 @@ namespace SynthemaRu
             }
         }
         
-        private void ToggleSwitch_Checked(object sender, RoutedEventArgs e) // НЕ РАБОТАЕТ /////////////////////////////////////////
+        private void ToggleSwitch_Checked(object sender, RoutedEventArgs e) 
         {
             playButton.Source = playBmp;
             LoadingBar.IsIndeterminate = true;
             BackgroundAudioPlayer.Instance.SkipNext();
         }
 
-        private void ToggleSwitch_Unchecked(object sender, RoutedEventArgs e) // НЕ РАБОТАЕТ /////////////////////////////////////////
+        private void ToggleSwitch_Unchecked(object sender, RoutedEventArgs e) 
         {
             playButton.Source = playBmp;
             LoadingBar.IsIndeterminate = true;
@@ -210,7 +218,7 @@ namespace SynthemaRu
 #endregion
 
         #region Page naviation
-
+        
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {
             while (NavigationService.BackStack.Any())
@@ -305,7 +313,6 @@ namespace SynthemaRu
             {
                 LoadingBar.IsIndeterminate = true;
                 DownloadingService.DownloadMainAndNews(Constants.BaseUrl);
-                LoadingBar.IsIndeterminate = false;
             }
             else if (MainPivot.SelectedIndex == 2) // обновить рецензии
             {

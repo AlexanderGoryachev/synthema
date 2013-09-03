@@ -10,6 +10,14 @@ namespace SynthemaRu
 {
     class AppData
     {
+
+        #region
+
+        public static bool IsMainDownloaded = false;
+
+        #endregion
+
+
         #region Smiles
 
         public static Dictionary<string, string> Smiles = new Dictionary<string, string>()
@@ -70,7 +78,7 @@ namespace SynthemaRu
             public string Username { get; set; }
             public string Userpic { get; set; }
             public string Date { get; set; }
-            public string Text { get; set; }
+            public List<SynthemaRu.Common.StringHelper.CommentText> Text { get; set; }
         }
 
         public static List<SimilarLink> SimilarLinks = new List<SimilarLink>();

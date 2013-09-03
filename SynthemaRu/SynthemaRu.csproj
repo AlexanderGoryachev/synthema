@@ -96,6 +96,7 @@
     <Compile Include="Common\DownloadingService.cs" />
     <Compile Include="Common\ParsingService.cs" />
     <Compile Include="Common\StringHelper.cs" />
+    <Compile Include="Common\StringToBoolConverter.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ImagePage.xaml.cs">
       <DependentUpon>ImagePage.xaml</DependentUpon>

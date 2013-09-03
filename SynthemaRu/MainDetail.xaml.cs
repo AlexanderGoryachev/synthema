@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using SynthemaRu.Common;
+using System.Windows.Data;
 
 namespace SynthemaRu
 {
@@ -69,13 +70,14 @@ namespace SynthemaRu
 
             #region Information
 
-            var Title = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='tbh']/h1").InnerText;
-            GroupTitleTextBlock.Text = Title.Substring(0, Title.IndexOf("- "));
-            AlbumTitleTextBlock.Text = Title.Remove(0, Title.IndexOf("- ") + 2);
+            var title = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='tbh']/h1").InnerText;
+            title = HttpUtility.HtmlDecode(title);
+            GroupTitleTextBlock.Text = title.Substring(0, title.IndexOf("- "));
+            AlbumTitleTextBlock.Text = title.Remove(0, title.IndexOf("- ") + 2);
 
             HtmlNode informationBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[1]/div[3]");
 
-            try 
+            try
             {
                 coverImageBaseNode = doc.DocumentNode.SelectSingleNode(@".//*[@id='dle-content']/div[@class='theblock']/div[@class='newf']/div/div[1]/a");
                 var coverUri = new Uri(Constants.BaseUrl + coverImageBaseNode.SelectSingleNode("img").GetAttributeValue("src", ""), UriKind.Absolute);
@@ -83,7 +85,7 @@ namespace SynthemaRu
                 BackgroundCoverImage.Visibility = Visibility.Visible;
             }
             catch (NullReferenceException)
-            { 
+            {
                 CoverImage.Visibility = Visibility.Collapsed;
             }
 
@@ -225,13 +227,12 @@ namespace SynthemaRu
                     var text = node.SelectSingleNode(@"div[@class='comtext']/div").InnerText;
                     var date = node.SelectSingleNode(@"div[@class='comtext']/text()").InnerText;
 
-                    text = text.Replace("<br>", "\n").Replace("<b>", string.Empty).Replace("</b>", string.Empty);
                     text = HttpUtility.HtmlDecode(text);
 
                     text = StringHelper.FormatSmiles(text, AppData.Smiles);
 
-                    var CommT = StringHelper.FormatQuotes(text);
-                    
+                    var commentText = StringHelper.FormatQuotes(text);
+
                     date = date.Replace("&nbsp;", "");
                     date = date.Trim();
 
@@ -239,7 +240,7 @@ namespace SynthemaRu
                     {
                         Username = username,
                         Userpic = userpic,
-                        Text = text,
+                        Text = commentText,
                         Date = date
                     });
                 }
@@ -262,12 +263,12 @@ namespace SynthemaRu
 
                 foreach (HtmlNode node in similarLinks)
                 {
-                    var title = node.InnerText;
-                    title = HttpUtility.HtmlDecode(title);
+                    var fullTitle = node.InnerText;
+                    fullTitle = HttpUtility.HtmlDecode(fullTitle);
                     AppData.SimilarLinks.Add(new AppData.SimilarLink
                     {
-                        GroupTitle = title.Substring(0, title.IndexOf("- ")),
-                        AlbumTitle = title.Remove(0, title.IndexOf("- ") + 2),
+                        GroupTitle = fullTitle.Substring(0, fullTitle.IndexOf("- ")),
+                        AlbumTitle = fullTitle.Remove(0, fullTitle.IndexOf("- ") + 2),
                         Url = "/MainDetail.xaml?mainDetailPath=" + node.GetAttributeValue("href", "")
                     });
                 }
@@ -295,7 +296,7 @@ namespace SynthemaRu
         }
 
         private void CoverImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {            
+        {
             if (coverImageBaseNode != null)
             {
                 var imgUrl = coverImageBaseNode.GetAttributeValue("href", string.Empty);

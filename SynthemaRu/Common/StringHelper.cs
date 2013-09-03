@@ -50,45 +50,50 @@ namespace SynthemaRu.Common
             return tempString;
         }
 
-        public static List<ComText> FormatQuotes(string inputString)
+        public static List<CommentText> FormatQuotes(string inputString)
         {
             var tempString = inputString;
-            var comText = new List<ComText>();
+            var commentText = new List<CommentText>();
 
             var j = 0;
             while (j != -1)
             {
-                var startIndexAuthor = tempString.IndexOf("<!--QuoteBegin ") + 15;
-                var endIndexAuthor = tempString.IndexOf(" -->Цитата:");
-
-                var startIndexQuoteText = tempString.IndexOf("<!--QuoteEBegin-->") + 18;
-                var endIndexQuoteText = tempString.IndexOf("<!--QuoteEnd-->");
-
                 var startIndexQuote = tempString.IndexOf("<!--QuoteBegin");
-                var endIndexQuote = tempString.IndexOf("<!--QuoteEEnd-->") + 16;
 
-                if (startIndexAuthor == -1 || startIndexQuoteText == -1 || startIndexQuote == -1 || 
-                    endIndexAuthor == -1 || endIndexQuoteText == -1 || endIndexQuote == -1)
+                if (startIndexQuote == -1)
+                {
+                    commentText.Add(new CommentText { ComText = tempString });
                     j = -1;
+                }
                 else
                 {
+                    var text = tempString.Substring(0, startIndexQuote);
+                    tempString = tempString.Remove(0, startIndexQuote);
+
+                    var startIndexAuthor = tempString.IndexOf("<!--QuoteBegin ") + 15;
+                    var endIndexAuthor = tempString.IndexOf(" -->Цитата:");
+
+                    var startIndexQuoteText = tempString.IndexOf("<!--QuoteEBegin-->") + 18;
+                    var endIndexQuoteText = tempString.IndexOf("<!--QuoteEnd-->");
+
+                    var endIndexQuote = tempString.IndexOf("<!--QuoteEEnd-->") + 16;
+
                     var quoteAuthor = tempString.Substring(startIndexAuthor, endIndexAuthor - startIndexAuthor);
                     var quoteText = tempString.Substring(startIndexQuoteText, endIndexQuoteText - startIndexQuoteText);
+                    tempString = tempString.Remove(0, endIndexQuote);
 
-                    tempString = tempString.Remove(startIndexQuote, endIndexQuote - startIndexQuote);
-
-                    comText.Add(new ComText { QuoteAuthor = quoteAuthor, QuoteText = quoteText });
+                    commentText.Add(new CommentText { QuoteAuthor = quoteAuthor, QuoteText = quoteText, ComText = text });
                 }
             }
 
-            return comText;
+            return commentText;
         }
 
-        public class ComText
+        public class CommentText
         {
             public string QuoteAuthor { get; set; }
             public string QuoteText { get; set; }
-            public string Text { get; set; }
+            public string ComText { get; set; }
         }
     }
 }

@@ -7,8 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:local="clr-namespace:ControlTiltEffect"
-    local:TiltEffect.IsTiltEnabled="True"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -16,6 +14,9 @@
     SupportedOrientations="Portrait" Orientation="Portrait">
 
     <phone:PhoneApplicationPage.Resources>
+        
+        <converter:StringToBoolConverter xmlns:converter="clr-namespace:SynthemaRu.Common" x:Key="StringToBoolConverter" />
+        
         <Style x:Key="HyperlinkButtonWrappingStyle"
         TargetType="HyperlinkButton">
             <Setter Property="Foreground"
@@ -46,22 +47,22 @@
                                     <VisualState x:Name="Disabled">
                                         <Storyboard>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
-                                                                    Storyboard.TargetName="TextElement">
+                                                                           Storyboard.TargetName="TextElement">
                                                 <DiscreteObjectKeyFrame KeyTime="0"
-                                                                Value="{StaticResource PhoneDisabledBrush}" />
+                                                                        Value="{StaticResource PhoneDisabledBrush}" />
                                             </ObjectAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             <Border Background="{TemplateBinding Background}"
-                            Margin="{StaticResource PhoneHorizontalMargin}"
-                            Padding="{TemplateBinding Padding}">
+                                    Margin="{StaticResource PhoneHorizontalMargin}"
+                                    Padding="{TemplateBinding Padding}">
                                 <TextBlock x:Name="TextElement"
-                                    HorizontalAlignment="Left"
-                                    Text="{TemplateBinding Content}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    TextWrapping="Wrap" />
+                                           HorizontalAlignment="Left"
+                                           Text="{TemplateBinding Content}"
+                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                           TextWrapping="Wrap" />
                             </Border>
                         </Border>
                     </ControlTemplate>
@@ -72,13 +73,13 @@
         <Style x:Key="HyperlinkButtonSimilarLinksStyle"
         TargetType="HyperlinkButton">
             <Setter Property="Foreground"
-            Value="{StaticResource PhoneForegroundBrush}" />
+                    Value="{StaticResource PhoneForegroundBrush}" />
             <Setter Property="Background"
-            Value="Transparent" />
+                    Value="Transparent" />
             <Setter Property="FontSize"
-            Value="{StaticResource PhoneFontSizeMedium}" />
+                    Value="{StaticResource PhoneFontSizeMedium}" />
             <Setter Property="Padding"
-            Value="0" />
+                    Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="HyperlinkButton">
@@ -91,14 +92,14 @@
                                     <VisualState x:Name="Disabled">
                                         <Storyboard>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
-                                                                    Storyboard.TargetName="TitleText">
+                                                                           Storyboard.TargetName="TitleText">
                                                 <DiscreteObjectKeyFrame KeyTime="0"
-                                                                Value="{StaticResource PhoneDisabledBrush}" />
+                                                                        Value="{StaticResource PhoneDisabledBrush}" />
                                             </ObjectAnimationUsingKeyFrames>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
-                                                                    Storyboard.TargetName="AlbumText">
+                                                                           Storyboard.TargetName="AlbumText">
                                                 <DiscreteObjectKeyFrame KeyTime="0"
-                                                                Value="{StaticResource PhoneDisabledBrush}" />
+                                                                        Value="{StaticResource PhoneDisabledBrush}" />
                                             </ObjectAnimationUsingKeyFrames>
                                         </Storyboard>
                                     </VisualState>
@@ -205,7 +206,7 @@
                                        Width="210"
                                        VerticalAlignment="Center"
                                        Tap="CoverImage_Tap"
-                                       local:TiltEffect.IsTiltEnabled="True" />
+                                       toolkit:TiltEffect.IsTiltEnabled="True" />
                             </StackPanel>
                             <ListBox x:Name="LinksListBox"
                                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -214,18 +215,18 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal"
-                                                Width="432">
+                                                    Width="432">
                                             <StackPanel Width="3"
                                                     VerticalAlignment="Stretch"
                                                     Background="#FFFFC800"
                                                     Margin="2,0,0,12">
                                             </StackPanel>
                                             <HyperlinkButton Style="{StaticResource HyperlinkButtonWrappingStyle}"
-                                                         Content="{Binding Value}"
-                                                         NavigateUri="{Binding Key}"
-                                                         Width="204"
-                                                         TargetName="_blank"
-                                                         Margin="0,0,0,12">
+                                                             Content="{Binding Value}"
+                                                             NavigateUri="{Binding Key}"
+                                                             Width="204"
+                                                             TargetName="_blank"
+                                                             Margin="0,0,0,12">
                                             </HyperlinkButton>
                                         </StackPanel>
                                     </DataTemplate>
@@ -246,7 +247,8 @@
 
             <phone:PivotItem Header="детали">
                 <Grid>
-                    <ListBox x:Name="DetailsListBox" Margin="12,0,0,0">
+                    <ListBox x:Name="DetailsListBox" 
+                             Margin="12,0,0,0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical"
@@ -270,7 +272,7 @@
             
             <phone:PivotItem Header="треклист">
                 <Grid>
-                    <ListBox x:Name="TracklistListBox" Margin="12,0,0,0" local:TiltEffect.SuppressTilt="True">
+                    <ListBox x:Name="TracklistListBox" Margin="12,0,0,0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical"
@@ -313,46 +315,80 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical"
-                                            Margin="0,24,0,0">
+                                            Margin="0,0,0,12">
                                     <StackPanel Orientation="Horizontal"
-                                                Margin="0,0,0,24">
+                                                Margin="0,0,0,12">
                                         <Image Source="{Binding Userpic}"
-                                       Height="74" 
-                                       Width="74" 
-                                       Stretch="Fill" 
-                                       VerticalAlignment="Top" 
-                                       HorizontalAlignment="Left" />
+                                               Height="74" 
+                                               Width="74" 
+                                               Stretch="Fill" 
+                                               VerticalAlignment="Top" 
+                                               HorizontalAlignment="Left" />
                                         <StackPanel Orientation="Vertical" 
-                                            HorizontalAlignment="Left"
-                                            Margin="12,0,0,0">
+                                                    HorizontalAlignment="Left"
+                                                    Margin="12,0,0,0">
                                             <TextBlock Width="346"
-                                               Text="{Binding Username}"
-                                               TextWrapping="Wrap"
-                                               VerticalAlignment="Top"
-                                               FontSize="36" 
-                                               Margin="0,-10,0,12" 
-                                               Foreground="#FFFFC800" 
-                                               FontFamily="Segoe WP Light" >
+                                                        Text="{Binding Username}"
+                                                        TextWrapping="Wrap"
+                                                        VerticalAlignment="Top"
+                                                        FontSize="36" 
+                                                        Margin="0,-10,0,12" 
+                                                        Foreground="#FFFFC800" 
+                                                        FontFamily="Segoe WP Light" >
                                             </TextBlock>
                                             <TextBlock Width="346" 
-                                               Text="{Binding Date}"
-                                               TextWrapping="Wrap"
-                                               VerticalAlignment="Top"
-                                               FontSize="24" 
-                                               Margin="0,-10,0,12"
-                                               Foreground="#FFFFFFFF"
-                                               FontFamily="Segoe WP Light">
+                                                       Text="{Binding Date}"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Top"
+                                                       FontSize="24" 
+                                                       Margin="0,-10,0,12"
+                                                       Foreground="#FFCCCCCC"
+                                                       FontFamily="Segoe WP Light">
                                             </TextBlock>
                                         </StackPanel>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding Text}"
-                                       VerticalAlignment="Top"
-                                       FontFamily="Segoe WP Light"
-                                       TextWrapping="Wrap"
-                                       Foreground="White"
-                                       Margin="0,-10,0,24"
-                                       Width="432"
-                                       FontSize="24" />
+                                    <ListBox ItemsSource="{Binding Text}" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <ListBoxItem>
+                                                    <StackPanel Margin="0,0,0,12">
+                                                        <TextBlock Text="{Binding ComText}" toolkit:TiltEffect.SuppressTilt="True"
+                                                                   VerticalAlignment="Top"
+                                                                   FontFamily="Segoe WP Light"
+                                                                   TextWrapping="Wrap"
+                                                                   Foreground="White"
+                                                                   Margin="0,0,0,24"
+                                                                   Width="432"
+                                                                   FontSize="24"
+                                                                   Visibility="{Binding ComText, Converter={StaticResource StringToBoolConverter}}" />
+                                                        <StackPanel Background="#22ffcc00" Margin="0,0,0,0" >
+                                                            <TextBlock VerticalAlignment="Top"
+                                                                       FontFamily="Segoe WP Light"
+                                                                       TextWrapping="Wrap"
+                                                                       Foreground="White"
+                                                                       Margin="12,8,12,10"
+                                                                       Width="408"
+                                                                       FontSize="24"
+                                                                       Visibility="{Binding QuoteAuthor, Converter={StaticResource StringToBoolConverter}}">
+                                                                <Run Text="Цитата:"/>
+                                                                <Run Text="{Binding QuoteAuthor}"/>
+                                                            </TextBlock>
+                                                            <TextBlock VerticalAlignment="Top"
+                                                                       FontFamily="Segoe WP Light"
+                                                                       TextWrapping="Wrap"
+                                                                       Foreground="White"
+                                                                       Margin="12,0,12,12"
+                                                                       Width="408"
+                                                                       FontSize="24"
+                                                                       Visibility="{Binding QuoteAuthor, Converter={StaticResource StringToBoolConverter}}">
+                                                                <Run Foreground="#FFCCCCCC" Text="{Binding QuoteText}"/>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </ListBoxItem>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
