@@ -91,13 +91,68 @@ namespace SynthemaRu
 
             try
             {
+                HtmlNodeCollection Links = informationBaseNode.SelectNodes("div//b/a");
+
+                var linksList = new Dictionary<string, string>();
+
+                foreach (HtmlNode node in Links)
+                {   
+                    if (!linksList.Keys.Contains(node.GetAttributeValue("href", "")))
+                        linksList.Add(node.GetAttributeValue("href", ""), node.InnerText);
+                }
+
+                LinksListBox.ItemsSource = linksList;
+
+                LinksListBox.Visibility = Visibility.Visible;
+            }
+            catch (NullReferenceException)
+            {
+                LinksListBox.Visibility = Visibility.Collapsed;
+            }
+
+            try
+            {
+                var promotext = (informationBaseNode.SelectSingleNode("div/div[text()][1]")).InnerText;
+                promotext = HttpUtility.HtmlDecode(promotext);
+                promotext = promotext.Replace("<br>", "\n");
+                PromotextTextBlock.Text = promotext;
+            }
+            catch (NullReferenceException)
+            {
+                PromotextTextBlock.Visibility = Visibility.Collapsed;
+            }
+
+            try 
+            {
+                HtmlNodeCollection Video = informationBaseNode.SelectNodes("div//iframe");
+
+                var VideoList = new List<string>();
+
+                foreach (HtmlNode node in Video)
+                {
+                    var source = node.GetAttributeValue("src", string.Empty);
+                    VideoList.Add(source);
+                }
+
+                VideoListBox.ItemsSource = VideoList;
+            }
+            catch { }
+
+            #endregion
+
+            #region Details
+
+            try
+            {
                 HtmlNodeCollection Details = informationBaseNode.SelectNodes(@"//div/b[
                                                                                     contains(text(),'Label') or
                                                                                     contains(text(),'Format') or
                                                                                     contains(text(),'Style') or
                                                                                     contains(text(),'Country') or
                                                                                     contains(text(),'Quality') or
-                                                                                    contains(text(),'Size')
+                                                                                    contains(text(),'Size') or
+                                                                                    contains(text(),'Artist') or
+                                                                                    contains(text(),'Title')
                                                                                 ]/text()");
                 var details = new Dictionary<string, string>();
                 foreach (HtmlNode detailNode in Details)
@@ -134,44 +189,22 @@ namespace SynthemaRu
                         detail = detail.Remove(0, 6);
                         details.Add("Размер", detail);
                     }
+                    else if (detail.Contains("Artist"))
+                    {
+                        detail = detail.Remove(0, 8);
+                        details.Add("Исполнитель", detail);
+                    }
+                    else if (detail.Contains("Title"))
+                    {
+                        detail = detail.Remove(0, 7);
+                        details.Add("Название", detail);
+                    }
                 }
                 DetailsListBox.ItemsSource = details;
             }
             catch (NullReferenceException)
             {
                 DetailsListBox.Visibility = Visibility.Collapsed;
-            }
-
-            try
-            {
-                HtmlNodeCollection Links = informationBaseNode.SelectNodes("div//b/a");
-
-                var linksList = new Dictionary<string, string>();
-
-                foreach (HtmlNode node in Links)
-                {
-                    linksList.Add(node.GetAttributeValue("href", ""), node.InnerText);
-                }
-
-                LinksListBox.ItemsSource = linksList;
-
-                LinksListBox.Visibility = Visibility.Visible;
-            }
-            catch (NullReferenceException)
-            {
-                LinksListBox.Visibility = Visibility.Collapsed;
-            }
-
-            try
-            {
-                var promotext = (informationBaseNode.SelectSingleNode("div/div[text()][1]")).InnerText;
-                promotext = HttpUtility.HtmlDecode(promotext);
-                promotext = promotext.Replace("<br>", "\n");
-                PromotextTextBlock.Text = promotext;
-            }
-            catch (NullReferenceException)
-            {
-                PromotextTextBlock.Visibility = Visibility.Collapsed;
             }
 
             #endregion

@@ -312,7 +312,7 @@
             </phone:PivotItem>
 
             <!--Pivot item -->
-            <phone:PivotItem Header="ссылки" Margin="12,28,12,80">
+            <phone:PivotItem Header="ссылки" Margin="12,28,12,80" >
                 <ListBox x:Name="LinksListBox" Margin="15,0,0,0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -346,6 +346,8 @@
                     <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="24" TextWrapping="Wrap">
                     	<Run Text="Неофициальный клиент для сайта Synthema.ru"/>
                     </TextBlock>
+                    <HyperlinkButton Content="http://www.youtube.com/embed/Y8pdRGlDiww" NavigateUri="http://www.youtube.com/embed/Y8pdRGlDiww" TargetName="_blank"/>
+
                 </StackPanel>
             </phone:PivotItem>
         </phone:Pivot>

@@ -241,6 +241,18 @@
                                    TextTrimming="WordEllipsis"
                                    FontFamily="Segoe WP Light" 
                                    Margin="0,0,0,24" />
+                        <ListBox x:Name="VideoListBox" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <phone:WebBrowser Source="{Binding}" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Center"
+                                                      IsScriptEnabled="True" 
+                                                      Width="432"
+                                                      Height="324"
+                                                      Margin="0,0,0,24" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        
                     </StackPanel>
                 </ScrollViewer>
             </phone:PivotItem>
@@ -425,6 +437,21 @@
                     </ListBox>
                 </Grid>
             </phone:PivotItem>
+            
+            <!--<phone:PivotItem Header="рейтинг">
+                <Grid>
+                    <StackPanel Margin="0,0" Height="90" Width="400" HorizontalAlignment="Left">
+                        <StackPanel.Background>
+                            <ImageBrush ImageSource="/Assets/five-stars_bg.png" Stretch="UniformToFill" AlignmentX="Left"/>
+                        </StackPanel.Background>
+                    </StackPanel>
+                    <StackPanel Margin="0,0" Height="93" Width="300" HorizontalAlignment="Left">
+                        <StackPanel.Background>
+                            <ImageBrush ImageSource="/Assets/five-stars.png" Stretch="UniformToFill" AlignmentX="Left"/>
+                        </StackPanel.Background>
+                    </StackPanel>
+                </Grid>
+            </phone:PivotItem>-->
 
         </phone:Pivot>
         

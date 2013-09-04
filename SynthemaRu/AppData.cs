@@ -37,7 +37,7 @@ namespace SynthemaRu
 
         public static string MainString = string.Empty;
 
-        public static ObservableCollection<MainItem> MainItems {get; set;}
+        public static ObservableCollection<MainItem> MainItems = new ObservableCollection<MainItem>();
 
         public class MainItem
         {
@@ -55,7 +55,7 @@ namespace SynthemaRu
 
         #region News
 
-        public static ObservableCollection<NewsItem> NewsItems { get; set; }
+        public static ObservableCollection<NewsItem> NewsItems = new ObservableCollection<NewsItem>();
 
         public class NewsItem
         {

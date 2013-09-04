@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.Advertising;
 using Microsoft.Phone.BackgroundAudio;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
@@ -46,6 +47,7 @@ namespace SynthemaRu
 
             MainListBox.ItemsSource = AppData.MainItems;
             NewsListBox.ItemsSource = AppData.NewsItems;
+            LinksListBox.ItemsSource = AppData.Links;
 
             if (!AppData.IsInternetAccess)
                 MessageBox.Show("Подключение к Интернету отсутствует. Для работы приложения необходим доступ к сети");

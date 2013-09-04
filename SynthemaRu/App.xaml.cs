@@ -75,18 +75,12 @@ namespace SynthemaRu
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
             var jsonString = LoadFileFromIsoStorage(Constants.MainItemsStorageFileName);
-            if (jsonString.Equals("[null]") == false)
-            {
-                try { AppData.MainItems = JsonConvert.DeserializeObject<ObservableCollection<AppData.MainItem>>(jsonString); }
-                catch { MessageBox.Show("Ошибка загрузки локальных данных (MainItems)"); }
-            }
+            try { AppData.MainItems = JsonConvert.DeserializeObject<ObservableCollection<AppData.MainItem>>(jsonString); }
+            catch { MessageBox.Show("Ошибка загрузки локальных данных (MainItems)"); }
 
             jsonString = LoadFileFromIsoStorage("NewsItems.json");
-            if (jsonString.Equals("[null]") == false)
-            {
-                try { AppData.NewsItems = JsonConvert.DeserializeObject<ObservableCollection<AppData.NewsItem>>(jsonString); }
-                catch { MessageBox.Show("Ошибка загрузки локальных данных (NewsItems)"); }
-            }
+            try { AppData.NewsItems = JsonConvert.DeserializeObject<ObservableCollection<AppData.NewsItem>>(jsonString); }
+            catch { MessageBox.Show("Ошибка загрузки локальных данных (NewsItems)"); }
 
             if (!DeviceNetworkInformation.IsNetworkAvailable)
                 AppData.IsInternetAccess = false;

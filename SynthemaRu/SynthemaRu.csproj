@@ -152,6 +152,8 @@
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\five-stars.png" />
+    <Content Include="Assets\five-stars_bg.png" />
     <Content Include="Assets\Tiles\ColoredLogo\FlipCycleTileLarge.png" />
     <Content Include="Assets\Tiles\ColoredLogo\FlipCycleTileMedium.png" />
     <Content Include="Assets\Tiles\ColoredLogo\FlipCycleTileSmall.png" />

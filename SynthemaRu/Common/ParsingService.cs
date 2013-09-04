@@ -31,25 +31,30 @@ namespace SynthemaRu.Common
                 var imgUrl = string.Empty;
                 try { imgUrl = node.SelectSingleNode(@"div[@class='news']/div/div[1]/a").GetAttributeValue("href", ""); }
                 catch { }
-
-                HtmlNodeCollection Details = node.SelectNodes(@"div[@class='news']/div/div/b[
+                var details = string.Empty;
+                try
+                {
+                    HtmlNodeCollection Details = node.SelectNodes(@"div[@class='news']/div/div/b[
                                                                     contains(text(),'Label') or
                                                                     contains(text(),'Format') or
                                                                     contains(text(),'Style') or
                                                                     contains(text(),'Country') or
                                                                     contains(text(),'Quality') or
-                                                                    contains(text(),'Size')
+                                                                    contains(text(),'Size') or
+                                                                    contains(text(),'Artist') or
+                                                                    contains(text(),'Title')
                                                                 ]/text()");
 
-                var details = string.Empty;
-                var i = 0;
-                foreach (HtmlNode detailNode in Details)
-                {
-                    var detail = HttpUtility.HtmlDecode(detailNode.InnerHtml);
-                    if (i < 1) details = detail;
-                    else details = details + "\n" + detail;
-                    i++;
+                    var i = 0;
+                    foreach (HtmlNode detailNode in Details)
+                    {
+                        var detail = HttpUtility.HtmlDecode(detailNode.InnerHtml);
+                        if (i < 1) details = detail;
+                        else details = details + "\n" + detail;
+                        i++;
+                    }
                 }
+                catch { }
 
                 title = HttpUtility.HtmlDecode(title);
                 description = HttpUtility.HtmlDecode(description);
@@ -110,6 +115,7 @@ namespace SynthemaRu.Common
                 });
             }
         }
+
 
 
     }
